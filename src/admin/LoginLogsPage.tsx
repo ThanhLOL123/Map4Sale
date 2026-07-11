@@ -58,6 +58,7 @@ export default function LoginLogsPage() {
       </div>
       {error && <p className="form-error">{error}</p>}
 
+      <div className="table-scroll">
       <table className="data-table">
         <thead>
           <tr>
@@ -93,6 +94,7 @@ export default function LoginLogsPage() {
           )}
         </tbody>
       </table>
+      </div>
       <p className="muted">
         Vị trí xác định theo IP nên chỉ mang tính tương đối; nhân viên dùng VPN sẽ hiển thị
         vị trí máy chủ VPN.

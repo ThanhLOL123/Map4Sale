@@ -113,6 +113,7 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 1rem;
+  padding-top: max(0.5rem, env(safe-area-inset-top));
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
@@ -150,15 +151,25 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 .map-page { height: 100%; display: flex; flex-direction: column; }
 .filter-bar {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 0.5rem;
-  align-items: center;
   padding: 0.5rem 1rem;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
-.filter-search { flex: 1 1 220px; min-width: 180px; }
-.filter-count { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+.filter-row { display: flex; gap: 0.5rem; align-items: center; }
+.filter-search { flex: 1 1 220px; min-width: 140px; }
+.filter-count { color: var(--muted); font-size: 0.85rem; white-space: nowrap; margin-left: auto; }
+.filter-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+/* Desktop: filters always visible; the mobile-only controls stay hidden. */
+.filter-toggle,
+.filter-apply,
+.filter-backdrop { display: none; }
 .map-error { padding: 0.5rem 1rem; }
 
 .map-wrap { position: relative; flex: 1; min-height: 0; }
@@ -177,6 +188,9 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   overflow-y: auto;
   padding: 1rem 1.25rem 1.5rem;
 }
+/* Backdrop + grab handle only apply to the mobile bottom-sheet layout. */
+.drawer-backdrop { display: none; }
+.drawer-handle { display: none; }
 .drawer-close {
   position: sticky;
   top: 0;
@@ -271,8 +285,10 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 .admin-toolbar input[type='search'] { margin-left: auto; }
 .admin-toolbar .btn-primary { white-space: nowrap; }
 
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .data-table {
   width: 100%;
+  min-width: 640px;
   border-collapse: collapse;
   background: var(--surface);
   border-radius: 10px;
@@ -336,8 +352,92 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   border: 1px solid var(--border);
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
+  /* Touch & iOS: 16px inputs avoid focus-zoom; larger tap targets. */
+  input, select, textarea { font-size: 16px; }
+  .btn { min-height: 40px; }
+
+  /* Header: drop the email, tighten spacing so it stays one row. */
+  .user-email { display: none; }
+  .app-header { gap: 0.4rem; padding-left: 0.75rem; padding-right: 0.75rem; }
+  .app-title { font-size: 0.95rem; }
+  .filter-bar { padding: 0.5rem 0.75rem; }
+
+  /* Filters: compact search row + a sheet opened by the "Bộ lọc" button. */
+  .filter-toggle { display: inline-block; white-space: nowrap; }
+  .filter-count { margin-left: 0; }
+  .filter-panel { display: none; }
+  .filter-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgb(0 0 0 / 0.4);
+    z-index: 1150;
+  }
+  .filter-panel.open {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1200;
+    background: var(--surface);
+    padding: calc(env(safe-area-inset-top) + 1rem) 1rem 1.25rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 12px 30px rgb(0 0 0 / 0.22);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .filter-panel.open select { width: 100%; }
+  .filter-apply { display: block; width: 100%; }
+
+  /* Detail panel becomes a bottom sheet over the map. */
+  .drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgb(0 0 0 / 0.4);
+    z-index: 999;
+  }
+  .detail-drawer {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 82vh;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 30px rgb(0 0 0 / 0.25);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+    animation: sheet-up 0.25s ease;
+  }
+  .drawer-handle {
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: #cbd5e1;
+    margin: 0.1rem auto 0.5rem;
+  }
+
+  /* Admin: stacked layout, nav as a scroll row, roomier rows. */
   .admin-body { flex-direction: column; }
-  .admin-nav { width: 100%; flex-direction: row; overflow-x: auto; }
-  .detail-drawer { width: 100vw; }
+  .admin-nav {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .admin-nav a { white-space: nowrap; }
+  .admin-main { padding: 1rem; }
+  .admin-toolbar { flex-wrap: wrap; }
+  .admin-toolbar input[type='search'] { margin-left: 0; width: 100%; }
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }

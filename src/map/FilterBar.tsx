@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { UniversityFilters } from '../lib/filters';
 import { EMPTY_FILTERS } from '../lib/filters';
 import type { University } from '../lib/types';
@@ -10,7 +10,22 @@ interface Props {
   matchCount: number;
 }
 
+/** Count of non-search filters that differ from the empty defaults. */
+function activeFilterCount(f: UniversityFilters): number {
+  let n = 0;
+  if (f.region) n++;
+  if (f.major) n++;
+  if (f.type) n++;
+  if (f.maxTuition != null) n++;
+  if (f.maxRanking != null) n++;
+  return n;
+}
+
 export default function FilterBar({ universities, filters, onChange, matchCount }: Props) {
+  // On mobile the selects live in a sheet toggled by this state; on desktop
+  // CSS keeps the panel visible and hides the toggle button.
+  const [open, setOpen] = useState(false);
+
   const regions = useMemo(
     () => [...new Set(universities.map((u) => u.region))].sort(),
     [universities],
@@ -21,62 +36,79 @@ export default function FilterBar({ universities, filters, onChange, matchCount 
   );
 
   const set = (patch: Partial<UniversityFilters>) => onChange({ ...filters, ...patch });
-  const hasActiveFilter =
-    filters.q || filters.region || filters.major || filters.type ||
-    filters.maxTuition != null || filters.maxRanking != null;
+  const activeCount = activeFilterCount(filters);
+  const hasActiveFilter = Boolean(filters.q) || activeCount > 0;
 
   return (
     <div className="filter-bar">
-      <input
-        type="search"
-        className="filter-search"
-        placeholder="Tìm trường (tên, thành phố)…"
-        value={filters.q}
-        onChange={(e) => set({ q: e.target.value })}
-      />
-      <select value={filters.region} onChange={(e) => set({ region: e.target.value })}>
-        <option value="">Khu vực: tất cả</option>
-        {regions.map((r) => (
-          <option key={r} value={r}>{r}</option>
-        ))}
-      </select>
-      <select value={filters.major} onChange={(e) => set({ major: e.target.value })}>
-        <option value="">Ngành: tất cả</option>
-        {majors.map((m) => (
-          <option key={m} value={m}>{m}</option>
-        ))}
-      </select>
-      <select value={filters.type} onChange={(e) => set({ type: e.target.value })}>
-        <option value="">Loại: tất cả</option>
-        <option value="public">Công lập</option>
-        <option value="private">Tư thục</option>
-      </select>
-      <select
-        value={filters.maxTuition ?? ''}
-        onChange={(e) => set({ maxTuition: e.target.value ? Number(e.target.value) : null })}
-      >
-        <option value="">Học phí: tất cả</option>
-        <option value="2.5">≤ 2.5 triệu KRW/kỳ</option>
-        <option value="4">≤ 4 triệu KRW/kỳ</option>
-        <option value="5">≤ 5 triệu KRW/kỳ</option>
-        <option value="6">≤ 6 triệu KRW/kỳ</option>
-      </select>
-      <select
-        value={filters.maxRanking ?? ''}
-        onChange={(e) => set({ maxRanking: e.target.value ? Number(e.target.value) : null })}
-      >
-        <option value="">Xếp hạng: tất cả</option>
-        <option value="5">Top 5</option>
-        <option value="10">Top 10</option>
-        <option value="20">Top 20</option>
-        <option value="50">Top 50</option>
-      </select>
-      <span className="filter-count">{matchCount} trường</span>
-      {hasActiveFilter && (
-        <button type="button" className="btn btn-ghost" onClick={() => onChange(EMPTY_FILTERS)}>
-          Xóa lọc
+      <div className="filter-row">
+        <input
+          type="search"
+          className="filter-search"
+          placeholder="Tìm trường (tên, thành phố)…"
+          value={filters.q}
+          onChange={(e) => set({ q: e.target.value })}
+        />
+        <button
+          type="button"
+          className="btn filter-toggle"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          Bộ lọc{activeCount > 0 ? ` (${activeCount})` : ''}
         </button>
-      )}
+        <span className="filter-count">{matchCount} trường</span>
+      </div>
+
+      {open && <div className="filter-backdrop" onClick={() => setOpen(false)} aria-hidden />}
+
+      <div className={`filter-panel${open ? ' open' : ''}`}>
+        <select value={filters.region} onChange={(e) => set({ region: e.target.value })}>
+          <option value="">Khu vực: tất cả</option>
+          {regions.map((r) => (
+            <option key={r} value={r}>{r}</option>
+          ))}
+        </select>
+        <select value={filters.major} onChange={(e) => set({ major: e.target.value })}>
+          <option value="">Ngành: tất cả</option>
+          {majors.map((m) => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
+        <select value={filters.type} onChange={(e) => set({ type: e.target.value })}>
+          <option value="">Loại: tất cả</option>
+          <option value="public">Công lập</option>
+          <option value="private">Tư thục</option>
+        </select>
+        <select
+          value={filters.maxTuition ?? ''}
+          onChange={(e) => set({ maxTuition: e.target.value ? Number(e.target.value) : null })}
+        >
+          <option value="">Học phí: tất cả</option>
+          <option value="2.5">≤ 2.5 triệu KRW/kỳ</option>
+          <option value="4">≤ 4 triệu KRW/kỳ</option>
+          <option value="5">≤ 5 triệu KRW/kỳ</option>
+          <option value="6">≤ 6 triệu KRW/kỳ</option>
+        </select>
+        <select
+          value={filters.maxRanking ?? ''}
+          onChange={(e) => set({ maxRanking: e.target.value ? Number(e.target.value) : null })}
+        >
+          <option value="">Xếp hạng: tất cả</option>
+          <option value="5">Top 5</option>
+          <option value="10">Top 10</option>
+          <option value="20">Top 20</option>
+          <option value="50">Top 50</option>
+        </select>
+        {hasActiveFilter && (
+          <button type="button" className="btn btn-ghost" onClick={() => onChange(EMPTY_FILTERS)}>
+            Xóa lọc
+          </button>
+        )}
+        <button type="button" className="btn btn-primary filter-apply" onClick={() => setOpen(false)}>
+          Xem {matchCount} trường
+        </button>
+      </div>
     </div>
   );
 }
