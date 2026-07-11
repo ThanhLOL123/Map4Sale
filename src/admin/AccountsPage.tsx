@@ -96,6 +96,7 @@ export default function AccountsPage() {
       {message && <p className="form-success">{message}</p>}
       {error && <p className="form-error">{error}</p>}
 
+      <div className="table-scroll">
       <table className="data-table">
         <thead>
           <tr>
@@ -135,6 +136,7 @@ export default function AccountsPage() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

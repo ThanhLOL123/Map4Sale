@@ -39,6 +39,7 @@ export default function UniversityListPage() {
         <Link to="/admin/universities/new" className="btn btn-primary">+ Thêm trường</Link>
       </div>
       {error && <p className="form-error">{error}</p>}
+      <div className="table-scroll">
       <table className="data-table">
         <thead>
           <tr>
@@ -79,6 +80,7 @@ export default function UniversityListPage() {
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

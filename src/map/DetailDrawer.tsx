@@ -16,12 +16,15 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function DetailDrawer({ university: u, onClose }: Props) {
   return (
-    <aside className="detail-drawer" aria-label={`Thông tin ${u.name_vi}`}>
-      <button type="button" className="drawer-close" onClick={onClose} aria-label="Đóng">
-        ✕
-      </button>
+    <>
+      <div className="drawer-backdrop" onClick={onClose} aria-hidden />
+      <aside className="detail-drawer" aria-label={`Thông tin ${u.name_vi}`}>
+        <div className="drawer-handle" aria-hidden />
+        <button type="button" className="drawer-close" onClick={onClose} aria-label="Đóng">
+          ✕
+        </button>
 
-      <header className="drawer-header">
+        <header className="drawer-header">
         {u.logo_url ? (
           <img src={u.logo_url} alt={`Logo ${u.name_en}`} className="school-logo" />
         ) : (
@@ -92,9 +95,10 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
         </Section>
       )}
 
-      <footer className="drawer-footer">
-        Cập nhật: {new Date(u.updated_at).toLocaleDateString('vi-VN')}
-      </footer>
-    </aside>
+        <footer className="drawer-footer">
+          Cập nhật: {new Date(u.updated_at).toLocaleDateString('vi-VN')}
+        </footer>
+      </aside>
+    </>
   );
 }
