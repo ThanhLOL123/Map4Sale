@@ -12,8 +12,10 @@ to **Vercel**; everything fits in the free tiers.
 ## Features
 
 - 🗺️ Full map of South Korea with one marker per university, clustered in dense areas (Seoul)
-- 🏫 Side drawer with the complete school profile, logo and campus photo gallery
-- 🔎 Search + filters: region, program/major, school type, max tuition, ranking
+- 🏫 Side drawer with the complete school profile, logo, campus photo gallery and videos
+- 🏷️ University name shown as an always-visible label on each map marker
+- 🎥 Videos per school — admin uploads a file or pastes a link (YouTube/Vimeo/direct)
+- 🔎 Search + filters: region, program/major, school type, max tuition, ranking; docked list beside the map
 - 🔐 Email/password login (Supabase Auth) with `admin` / `sale` roles and RLS
 - 🛠️ Admin panel: university CRUD (coordinates by map click or Nominatim geocoding),
   logo & photo uploads to Supabase Storage, sales-account management

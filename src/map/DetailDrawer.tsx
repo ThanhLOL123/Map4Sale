@@ -14,6 +14,44 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+/** Turn a YouTube/Vimeo watch URL into its embeddable form, else null. */
+function toEmbedUrl(url: string): string | null {
+  const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vimeo = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
+  return null;
+}
+
+function VideoEmbed({ url }: { url: string }) {
+  const embed = toEmbedUrl(url);
+  if (embed) {
+    return (
+      <div className="video-embed">
+        <iframe
+          src={embed}
+          title="Video giới thiệu"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
+  // Uploaded file (Storage URL / blob:) or a direct video link.
+  if (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url) || url.startsWith('blob:') || url.includes('/storage/')) {
+    return (
+      <div className="video-embed">
+        <video src={url} controls preload="metadata" />
+      </div>
+    );
+  }
+  return (
+    <a href={url} target="_blank" rel="noreferrer" className="video-link">
+      ▶︎ Xem video
+    </a>
+  );
+}
+
 export default function DetailDrawer({ university: u, onClose }: Props) {
   return (
     <>
@@ -62,6 +100,16 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
             </a>
           ))}
         </div>
+      )}
+
+      {u.video_urls.length > 0 && (
+        <Section title="🎥 Video">
+          <div className="video-list-view">
+            {u.video_urls.map((url) => (
+              <VideoEmbed key={url} url={url} />
+            ))}
+          </div>
+        </Section>
       )}
 
       <Section title="🎓 Ngành đào tạo">

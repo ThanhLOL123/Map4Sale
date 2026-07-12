@@ -10,6 +10,9 @@
       "/samples/campus-2.svg",
       "/samples/campus-3.svg"
     ],
+    "video_urls": [
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw"
+    ],
     "lat": 37.4599,
     "lng": 126.9519,
     "city": "Seoul",
@@ -46,6 +49,7 @@
       "/samples/campus-2.svg",
       "/samples/campus-3.svg"
     ],
+    "video_urls": [],
     "lat": 36.3721,
     "lng": 127.3604,
     "city": "Daejeon",
@@ -80,6 +84,9 @@
     "image_urls": [
       "/samples/campus-3.svg",
       "/samples/campus-4.svg"
+    ],
+    "video_urls": [
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw"
     ],
     "lat": 37.5665,
     "lng": 126.9387,
@@ -118,6 +125,7 @@
       "/samples/campus-1.svg",
       "/samples/campus-2.svg"
     ],
+    "video_urls": [],
     "lat": 37.5895,
     "lng": 127.0323,
     "city": "Seoul",
@@ -154,6 +162,7 @@
       "/samples/campus-1.svg",
       "/samples/campus-2.svg"
     ],
+    "video_urls": [],
     "lat": 36.0136,
     "lng": 129.3223,
     "city": "Pohang",
@@ -189,6 +198,7 @@
       "/samples/campus-2.svg",
       "/samples/campus-3.svg"
     ],
+    "video_urls": [],
     "lat": 37.5876,
     "lng": 126.9938,
     "city": "Seoul",
@@ -225,6 +235,7 @@
       "/samples/campus-4.svg",
       "/samples/campus-1.svg"
     ],
+    "video_urls": [],
     "lat": 37.5573,
     "lng": 127.0454,
     "city": "Seoul",
@@ -260,6 +271,7 @@
       "/samples/campus-4.svg",
       "/samples/campus-1.svg"
     ],
+    "video_urls": [],
     "lat": 37.5966,
     "lng": 127.0526,
     "city": "Seoul",
@@ -295,6 +307,7 @@
       "/samples/campus-1.svg",
       "/samples/campus-2.svg"
     ],
+    "video_urls": [],
     "lat": 37.5622,
     "lng": 126.9469,
     "city": "Seoul",
@@ -331,6 +344,7 @@
       "/samples/campus-3.svg",
       "/samples/campus-4.svg"
     ],
+    "video_urls": [],
     "lat": 37.5509,
     "lng": 126.941,
     "city": "Seoul",
@@ -365,6 +379,7 @@
       "/samples/campus-3.svg",
       "/samples/campus-4.svg"
     ],
+    "video_urls": [],
     "lat": 37.5051,
     "lng": 126.9571,
     "city": "Seoul",
@@ -400,6 +415,7 @@
       "/samples/campus-4.svg",
       "/samples/campus-1.svg"
     ],
+    "video_urls": [],
     "lat": 37.5408,
     "lng": 127.0793,
     "city": "Seoul",
@@ -436,6 +452,7 @@
       "/samples/campus-2.svg",
       "/samples/campus-3.svg"
     ],
+    "video_urls": [],
     "lat": 37.5583,
     "lng": 126.9986,
     "city": "Seoul",
@@ -470,6 +487,7 @@
       "/samples/campus-2.svg",
       "/samples/campus-3.svg"
     ],
+    "video_urls": [],
     "lat": 37.5511,
     "lng": 126.925,
     "city": "Seoul",
@@ -504,6 +522,7 @@
       "/samples/campus-3.svg",
       "/samples/campus-4.svg"
     ],
+    "video_urls": [],
     "lat": 37.5509,
     "lng": 127.0737,
     "city": "Seoul",
@@ -539,6 +558,7 @@
       "/samples/campus-1.svg",
       "/samples/campus-2.svg"
     ],
+    "video_urls": [],
     "lat": 37.4963,
     "lng": 126.9575,
     "city": "Seoul",
@@ -573,6 +593,7 @@
       "/samples/campus-1.svg",
       "/samples/campus-2.svg"
     ],
+    "video_urls": [],
     "lat": 37.4501,
     "lng": 126.6547,
     "city": "Incheon",
@@ -607,6 +628,7 @@
       "/samples/campus-2.svg",
       "/samples/campus-3.svg"
     ],
+    "video_urls": [],
     "lat": 37.2837,
     "lng": 127.0439,
     "city": "Suwon",
@@ -642,6 +664,7 @@
       "/samples/campus-4.svg",
       "/samples/campus-1.svg"
     ],
+    "video_urls": [],
     "lat": 37.4508,
     "lng": 127.1274,
     "city": "Seongnam",
@@ -676,6 +699,7 @@
       "/samples/campus-4.svg",
       "/samples/campus-1.svg"
     ],
+    "video_urls": [],
     "lat": 35.2335,
     "lng": 129.081,
     "city": "Busan",
@@ -710,6 +734,7 @@
       "/samples/campus-1.svg",
       "/samples/campus-2.svg"
     ],
+    "video_urls": [],
     "lat": 35.8906,
     "lng": 128.6106,
     "city": "Daegu",
@@ -745,6 +770,7 @@
       "/samples/campus-3.svg",
       "/samples/campus-4.svg"
     ],
+    "video_urls": [],
     "lat": 35.176,
     "lng": 126.9059,
     "city": "Gwangju",

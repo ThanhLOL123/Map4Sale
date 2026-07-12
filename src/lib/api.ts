@@ -57,6 +57,7 @@ function normalizeUniversity(row: Record<string, unknown>): University {
   return {
     ...(row as unknown as University),
     image_urls: (row.image_urls as string[] | null) ?? [],
+    video_urls: (row.video_urls as string[] | null) ?? [],
     majors: (row.majors as string[] | null) ?? [],
   };
 }
@@ -66,20 +67,21 @@ function normalizeUniversity(row: Record<string, unknown>): University {
 // ---------------------------------------------------------------------------
 
 /**
- * Upload an image file chosen by the admin and return its URL.
+ * Upload a media file chosen by the admin and return its URL.
  * target = 'logo'  → single logo image
  * target = 'photo' → campus photo (appended to the gallery by the form)
+ * target = 'video' → campus video file (appended to video_urls by the form)
  * The caller persists the returned URL on the university record.
  */
 export async function uploadUniversityImage(
   universityId: string,
   file: File,
-  target: 'logo' | 'photo',
+  target: 'logo' | 'photo' | 'video',
 ): Promise<string> {
   if (isDemoMode) return URL.createObjectURL(file);
 
   const supabase = requireSupabase();
-  const folder = target === 'logo' ? 'logo' : 'photos';
+  const folder = target === 'logo' ? 'logo' : target === 'video' ? 'videos' : 'photos';
   const safeName = file.name.replace(/[^\w.-]+/g, '_');
   const path = `${universityId}/${folder}/${Date.now()}-${safeName}`;
 
@@ -103,7 +105,7 @@ export async function deleteUniversityImage(url: string): Promise<void> {
 
 async function removeUniversityFolder(universityId: string): Promise<void> {
   const supabase = requireSupabase();
-  for (const folder of ['logo', 'photos']) {
+  for (const folder of ['logo', 'photos', 'videos']) {
     const prefix = `${universityId}/${folder}`;
     const { data } = await supabase.storage.from(BUCKET).list(prefix, { limit: 100 });
     const paths = (data ?? []).map((f) => `${prefix}/${f.name}`);

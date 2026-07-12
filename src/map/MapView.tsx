@@ -84,10 +84,8 @@ export default function MapView() {
                   position={[u.lat, u.lng]}
                   eventHandlers={{ click: () => setSelected(u) }}
                 >
-                  <Tooltip direction="top" offset={[-15, -10]}>
-                    <strong>{u.name_vi}</strong>
-                    <br />
-                    {u.city} · {u.type === 'public' ? 'Công lập' : 'Tư thục'}
+                  <Tooltip permanent direction="top" offset={[-15, -10]} className="marker-label">
+                    {u.name_vi}
                   </Tooltip>
                 </Marker>
               ))}

@@ -7,6 +7,7 @@ export interface University {
   name_vi: string;
   logo_url: string | null;
   image_urls: string[];
+  video_urls: string[];
   lat: number;
   lng: number;
   city: string;

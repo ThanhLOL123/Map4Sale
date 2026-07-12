@@ -25,6 +25,7 @@ function emptyForm(): UniversityInput {
     name_vi: '',
     logo_url: null,
     image_urls: [],
+    video_urls: [],
     lat: 37.5665,
     lng: 126.978,
     city: '',
@@ -61,6 +62,7 @@ export default function UniversityFormPage() {
 
   const [form, setForm] = useState<UniversityInput>(emptyForm);
   const [majorsText, setMajorsText] = useState('');
+  const [videoLink, setVideoLink] = useState('');
   const [loading, setLoading] = useState(!isNew);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -108,7 +110,7 @@ export default function UniversityFormPage() {
     }
   }
 
-  async function onUpload(files: FileList | null, target: 'logo' | 'photo') {
+  async function onUpload(files: FileList | null, target: 'logo' | 'photo' | 'video') {
     if (!files?.length) return;
     setUploading(true);
     setError(null);
@@ -119,12 +121,16 @@ export default function UniversityFormPage() {
       } else {
         const urls: string[] = [];
         for (const file of Array.from(files)) {
-          urls.push(await uploadUniversityImage(form.id, file, 'photo'));
+          urls.push(await uploadUniversityImage(form.id, file, target));
         }
-        setForm((f) => ({ ...f, image_urls: [...f.image_urls, ...urls] }));
+        setForm((f) =>
+          target === 'video'
+            ? { ...f, video_urls: [...f.video_urls, ...urls] }
+            : { ...f, image_urls: [...f.image_urls, ...urls] },
+        );
       }
     } catch (e) {
-      setError(`Tải ảnh thất bại: ${String(e)}`);
+      setError(`Tải lên thất bại: ${String(e)}`);
     } finally {
       setUploading(false);
     }
@@ -133,6 +139,18 @@ export default function UniversityFormPage() {
   function removePhoto(url: string) {
     setForm((f) => ({ ...f, image_urls: f.image_urls.filter((x) => x !== url) }));
     void deleteUniversityImage(url); // best-effort Storage cleanup (spec §5.4)
+  }
+
+  function addVideoLink() {
+    const url = videoLink.trim();
+    if (!url) return;
+    setForm((f) => (f.video_urls.includes(url) ? f : { ...f, video_urls: [...f.video_urls, url] }));
+    setVideoLink('');
+  }
+
+  function removeVideo(url: string) {
+    setForm((f) => ({ ...f, video_urls: f.video_urls.filter((x) => x !== url) }));
+    void deleteUniversityImage(url); // no-op for external links; removes uploaded files
   }
 
   function removeLogo() {
@@ -224,7 +242,7 @@ export default function UniversityFormPage() {
       </fieldset>
 
       <fieldset>
-        <legend>Hình ảnh (tải file từ máy — lưu trên Supabase Storage)</legend>
+        <legend>Hình ảnh & Video (tải file từ máy — lưu trên Supabase Storage)</legend>
         <div className="upload-block">
           <label className="upload-label">
             Logo (1 ảnh)
@@ -264,7 +282,46 @@ export default function UniversityFormPage() {
             ))}
           </div>
         </div>
-        {uploading && <p className="muted">Đang tải ảnh lên…</p>}
+        <div className="upload-block">
+          <label className="upload-label">
+            Video khuôn viên — tải file (nhiều video)
+            <input
+              type="file"
+              accept="video/*"
+              multiple
+              disabled={uploading}
+              onChange={(e) => void onUpload(e.target.files, 'video')}
+            />
+          </label>
+          <div className="video-link-row">
+            <input
+              type="url"
+              placeholder="…hoặc dán link video (YouTube, Vimeo, .mp4…)"
+              value={videoLink}
+              onChange={(e) => setVideoLink(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addVideoLink();
+                }
+              }}
+            />
+            <button type="button" className="btn" onClick={addVideoLink}>
+              Thêm link video
+            </button>
+          </div>
+          <ul className="video-list">
+            {form.video_urls.map((url) => (
+              <li key={url}>
+                <span className="video-url">{url}</span>
+                <button type="button" className="btn btn-danger" onClick={() => removeVideo(url)}>
+                  Xóa
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {uploading && <p className="muted">Đang tải lên…</p>}
       </fieldset>
 
       <fieldset>
