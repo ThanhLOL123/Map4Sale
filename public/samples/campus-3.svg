@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Ảnh mẫu khuôn viên">
+  <defs>
+    <linearGradient id="sky3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6ee7b7"/><stop offset="1" stop-color="#d1fae5"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#sky3)"/>
+  <rect y="290" width="640" height="110" fill="#065f46"/>
+  <circle cx="110" cy="270" r="46" fill="#047857"/><rect x="104" y="270" width="12" height="40" fill="#7c2d12"/>
+  <circle cx="530" cy="275" r="40" fill="#047857"/><rect x="524" y="275" width="12" height="36" fill="#7c2d12"/>
+  <rect x="230" y="120" width="200" height="180" fill="#10b981"/>
+  <polygon points="220,120 440,120 330,70" fill="#047857"/>
+  <rect x="315" y="230" width="30" height="70" fill="#065f46"/>
+  <g fill="#ecfdf5">
+    <rect x="255" y="150" width="34" height="44"/><rect x="370" y="150" width="34" height="44"/>
+  </g>
+  <text x="320" y="360" font-family="Arial, sans-serif" font-size="26" fill="#ecfdf5" text-anchor="middle" font-weight="bold">Campus (ảnh mẫu)</text>
+</svg>

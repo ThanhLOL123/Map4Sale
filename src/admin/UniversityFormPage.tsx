@@ -39,6 +39,7 @@ function emptyForm(): UniversityInput {
     gpa_req: '',
     dorm_info: '',
     living_cost: '',
+    important_notes: '',
     sale_notes: '',
   };
 }
@@ -305,6 +306,9 @@ export default function UniversityFormPage() {
         </label>
         <label>Chi phí sinh hoạt
           <textarea rows={2} value={form.living_cost} onChange={(e) => set('living_cost', e.target.value)} />
+        </label>
+        <label>Thông tin lưu ý quan trọng (hiển thị cho Sale)
+          <textarea rows={3} value={form.important_notes} onChange={(e) => set('important_notes', e.target.value)} />
         </label>
         <label>Ghi chú nội bộ cho Sale
           <textarea rows={3} value={form.sale_notes} onChange={(e) => set('sale_notes', e.target.value)} />

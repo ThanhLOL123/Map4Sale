@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Logo mẫu">
+  <rect width="128" height="128" rx="20" fill="#1d4ed8"/>
+  <path d="M64 20 L104 38 V70 C104 94 86 106 64 112 C42 106 24 94 24 70 V38 Z" fill="#dbeafe"/>
+  <path d="M64 34 L90 46 V70 C90 86 78 94 64 98 C50 94 38 86 38 70 V46 Z" fill="#1d4ed8"/>
+  <text x="64" y="78" font-family="Georgia, serif" font-size="34" fill="#dbeafe" text-anchor="middle" font-weight="bold">U</text>
+</svg>

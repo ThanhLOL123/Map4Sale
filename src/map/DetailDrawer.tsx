@@ -47,6 +47,13 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
         </div>
       </header>
 
+      {u.important_notes && (
+        <div className="important-notes" role="note">
+          <span className="important-notes-title">⚠️ Thông tin lưu ý quan trọng</span>
+          <p>{u.important_notes}</p>
+        </div>
+      )}
+
       {u.image_urls.length > 0 && (
         <div className="gallery">
           {u.image_urls.map((url) => (

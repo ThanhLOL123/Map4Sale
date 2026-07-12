@@ -21,6 +21,7 @@ export interface University {
   gpa_req: string;
   dorm_info: string;
   living_cost: string;
+  important_notes: string;
   sale_notes: string;
   updated_at: string;
 }

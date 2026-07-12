@@ -1,12 +1,8 @@
-import { useMemo, useState } from 'react';
-import AppHeader from '../components/AppHeader';
-import DetailDrawer from '../map/DetailDrawer';
-import FilterBar from '../map/FilterBar';
+import { useMemo } from 'react';
 import { parseTuitionMillions } from '../lib/filters';
-import { useUniversityBrowser } from '../lib/useUniversityBrowser';
 import type { University } from '../lib/types';
 
-type SortKey = 'ranking' | 'name' | 'tuition';
+export type SortKey = 'ranking' | 'name' | 'tuition';
 
 function sortUniversities(list: University[], key: SortKey): University[] {
   const copy = [...list];
@@ -17,39 +13,33 @@ function sortUniversities(list: University[], key: SortKey): University[] {
       return copy.sort((a, b) => {
         const ta = parseTuitionMillions(a.tuition);
         const tb = parseTuitionMillions(b.tuition);
-        // Records without a parseable tuition sort last.
-        return (ta ?? Infinity) - (tb ?? Infinity);
+        return (ta ?? Infinity) - (tb ?? Infinity); // unparseable tuition sorts last
       });
     case 'ranking':
     default:
-      // Unranked schools sort last.
       return copy.sort((a, b) => (a.ranking ?? Infinity) - (b.ranking ?? Infinity));
   }
 }
 
-export default function UniversityListView() {
-  const { universities, filtered, error, filters, setFilters, selected, setSelected } =
-    useUniversityBrowser();
-  const [sort, setSort] = useState<SortKey>('ranking');
+interface Props {
+  universities: University[]; // already filtered
+  selected: University | null;
+  onSelect: (u: University) => void;
+  sort: SortKey;
+  onSortChange: (s: SortKey) => void;
+}
 
-  const rows = useMemo(() => sortUniversities(filtered, sort), [filtered, sort]);
+/** Docked, scrollable compact-rows list beside the map. */
+export default function SideList({ universities, selected, onSelect, sort, onSortChange }: Props) {
+  const rows = useMemo(() => sortUniversities(universities, sort), [universities, sort]);
 
   return (
-    <div className="list-page">
-      <AppHeader />
-
-      <FilterBar
-        universities={universities}
-        filters={filters}
-        onChange={setFilters}
-        matchCount={filtered.length}
-      />
-
+    <div className="side-list">
       <div className="list-toolbar">
         <span className="muted">{rows.length} trường</span>
         <label className="sort-control">
           Sắp xếp
-          <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
+          <select value={sort} onChange={(e) => onSortChange(e.target.value as SortKey)}>
             <option value="ranking">Xếp hạng</option>
             <option value="name">Tên (A–Z)</option>
             <option value="tuition">Học phí (thấp → cao)</option>
@@ -57,13 +47,15 @@ export default function UniversityListView() {
         </label>
       </div>
 
-      {error && <p className="form-error map-error">{error}</p>}
-
       <div className="list-scroll">
         <ul className="uni-list">
           {rows.map((u) => (
             <li key={u.id}>
-              <button type="button" className="uni-row" onClick={() => setSelected(u)}>
+              <button
+                type="button"
+                className={`uni-row${selected?.id === u.id ? ' uni-row-active' : ''}`}
+                onClick={() => onSelect(u)}
+              >
                 {u.logo_url ? (
                   <img src={u.logo_url} alt="" className="uni-row-logo" />
                 ) : (
@@ -85,13 +77,11 @@ export default function UniversityListView() {
               </button>
             </li>
           ))}
-          {rows.length === 0 && !error && (
+          {rows.length === 0 && (
             <li className="uni-list-empty muted">Không có trường nào khớp bộ lọc.</li>
           )}
         </ul>
       </div>
-
-      {selected && <DetailDrawer university={selected} onClose={() => setSelected(null)} />}
     </div>
   );
 }

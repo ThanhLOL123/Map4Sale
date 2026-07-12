@@ -7,7 +7,6 @@ import UniversityListPage from './admin/UniversityListPage';
 import { AuthProvider } from './auth/AuthContext';
 import LoginPage from './auth/LoginPage';
 import ProtectedRoute from './auth/ProtectedRoute';
-import UniversityListView from './list/UniversityListView';
 import MapView from './map/MapView';
 
 export default function App() {
@@ -19,7 +18,6 @@ export default function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<MapView />} />
-            <Route path="/list" element={<UniversityListView />} />
           </Route>
 
           <Route element={<ProtectedRoute adminOnly />}>
