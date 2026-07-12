@@ -1,12 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
 import { MapContainer, Marker, TileLayer, Tooltip } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
-import { fetchUniversities } from '../lib/api';
-import { EMPTY_FILTERS, filterUniversities, type UniversityFilters } from '../lib/filters';
-import { isDemoMode } from '../lib/supabase';
-import type { University } from '../lib/types';
+import AppHeader from '../components/AppHeader';
+import { useUniversityBrowser } from '../lib/useUniversityBrowser';
 import DetailDrawer from './DetailDrawer';
 import FilterBar from './FilterBar';
 import './leafletIcon';
@@ -16,38 +11,12 @@ const KOREA_CENTER: [number, number] = [36.35, 127.8];
 const KOREA_ZOOM = 7;
 
 export default function MapView() {
-  const { profile, isAdmin, signOut } = useAuth();
-  const [universities, setUniversities] = useState<University[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<UniversityFilters>(EMPTY_FILTERS);
-  const [selected, setSelected] = useState<University | null>(null);
-
-  useEffect(() => {
-    fetchUniversities()
-      .then(setUniversities)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Không tải được dữ liệu.'));
-  }, []);
-
-  const filtered = useMemo(
-    () => filterUniversities(universities, filters),
-    [universities, filters],
-  );
+  const { universities, filtered, error, filters, setFilters, selected, setSelected } =
+    useUniversityBrowser();
 
   return (
     <div className="map-page">
-      <header className="app-header">
-        <span className="app-title">🗺️ Map4Sale</span>
-        {isDemoMode && <span className="badge badge-demo">DEMO</span>}
-        <div className="app-header-right">
-          {isAdmin && <Link to="/admin" className="btn btn-ghost">Quản trị</Link>}
-          <span className="user-email">{profile?.email}</span>
-          {!isDemoMode && (
-            <button type="button" className="btn btn-ghost" onClick={() => void signOut()}>
-              Đăng xuất
-            </button>
-          )}
-        </div>
-      </header>
+      <AppHeader />
 
       <FilterBar
         universities={universities}
