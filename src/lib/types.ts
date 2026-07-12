@@ -7,6 +7,7 @@ export interface University {
   name_vi: string;
   logo_url: string | null;
   image_urls: string[];
+  video_urls: string[];
   lat: number;
   lng: number;
   city: string;
@@ -21,6 +22,7 @@ export interface University {
   gpa_req: string;
   dorm_info: string;
   living_cost: string;
+  important_notes: string;
   sale_notes: string;
   updated_at: string;
 }

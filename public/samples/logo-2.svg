@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Logo mẫu">
+  <rect width="128" height="128" rx="20" fill="#b91c1c"/>
+  <circle cx="64" cy="64" r="40" fill="#fee2e2"/>
+  <circle cx="64" cy="64" r="30" fill="#b91c1c"/>
+  <text x="64" y="76" font-family="Georgia, serif" font-size="30" fill="#fee2e2" text-anchor="middle" font-weight="bold">U</text>
+</svg>

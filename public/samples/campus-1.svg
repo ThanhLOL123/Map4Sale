@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Ảnh mẫu khuôn viên">
+  <defs>
+    <linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#93c5fd"/><stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#sky1)"/>
+  <circle cx="540" cy="80" r="42" fill="#fde68a"/>
+  <rect y="280" width="640" height="120" fill="#4d7c0f"/>
+  <rect x="70" y="150" width="150" height="150" fill="#1d4ed8"/>
+  <rect x="90" y="180" width="30" height="40" fill="#bfdbfe"/><rect x="140" y="180" width="30" height="40" fill="#bfdbfe"/>
+  <rect x="90" y="240" width="30" height="40" fill="#bfdbfe"/><rect x="140" y="240" width="30" height="40" fill="#bfdbfe"/>
+  <polygon points="60,150 230,150 145,100" fill="#1e3a8a"/>
+  <rect x="300" y="110" width="200" height="190" fill="#3b82f6"/>
+  <rect x="325" y="140" width="40" height="50" fill="#dbeafe"/><rect x="435" y="140" width="40" height="50" fill="#dbeafe"/>
+  <rect x="325" y="210" width="40" height="50" fill="#dbeafe"/><rect x="435" y="210" width="40" height="50" fill="#dbeafe"/>
+  <rect x="385" y="240" width="30" height="60" fill="#1e3a8a"/>
+  <text x="320" y="360" font-family="Arial, sans-serif" font-size="26" fill="#ecfccb" text-anchor="middle" font-weight="bold">Campus (ảnh mẫu)</text>
+</svg>

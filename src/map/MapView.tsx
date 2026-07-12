@@ -1,53 +1,47 @@
-import { useEffect, useMemo, useState } from 'react';
-import { MapContainer, Marker, TileLayer, Tooltip } from 'react-leaflet';
+import { useEffect, useState } from 'react';
+import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
-import { fetchUniversities } from '../lib/api';
-import { EMPTY_FILTERS, filterUniversities, type UniversityFilters } from '../lib/filters';
-import { isDemoMode } from '../lib/supabase';
+import AppHeader from '../components/AppHeader';
+import { useUniversityBrowser } from '../lib/useUniversityBrowser';
 import type { University } from '../lib/types';
 import DetailDrawer from './DetailDrawer';
 import FilterBar from './FilterBar';
+import SideList, { type SortKey } from './SideList';
 import './leafletIcon';
 
 // South Korea, framed nation-wide
 const KOREA_CENTER: [number, number] = [36.35, 127.8];
 const KOREA_ZOOM = 7;
 
-export default function MapView() {
-  const { profile, isAdmin, signOut } = useAuth();
-  const [universities, setUniversities] = useState<University[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<UniversityFilters>(EMPTY_FILTERS);
-  const [selected, setSelected] = useState<University | null>(null);
+type MobileView = 'map' | 'list';
+
+/**
+ * Pans to the selected school and re-measures the map after it becomes visible
+ * again on mobile (Leaflet mis-sizes when its container was display:none).
+ */
+function MapController({ selected, mobileView }: { selected: University | null; mobileView: MobileView }) {
+  const map = useMap();
 
   useEffect(() => {
-    fetchUniversities()
-      .then(setUniversities)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Không tải được dữ liệu.'));
-  }, []);
+    if (selected) map.flyTo([selected.lat, selected.lng], Math.max(map.getZoom(), 11), { duration: 0.6 });
+  }, [selected, map]);
 
-  const filtered = useMemo(
-    () => filterUniversities(universities, filters),
-    [universities, filters],
-  );
+  useEffect(() => {
+    if (mobileView === 'map') setTimeout(() => map.invalidateSize(), 0);
+  }, [mobileView, map]);
+
+  return null;
+}
+
+export default function MapView() {
+  const { universities, filtered, error, filters, setFilters, selected, setSelected } =
+    useUniversityBrowser();
+  const [sort, setSort] = useState<SortKey>('ranking');
+  const [mobileView, setMobileView] = useState<MobileView>('map');
 
   return (
-    <div className="map-page">
-      <header className="app-header">
-        <span className="app-title">🗺️ Map4Sale</span>
-        {isDemoMode && <span className="badge badge-demo">DEMO</span>}
-        <div className="app-header-right">
-          {isAdmin && <Link to="/admin" className="btn btn-ghost">Quản trị</Link>}
-          <span className="user-email">{profile?.email}</span>
-          {!isDemoMode && (
-            <button type="button" className="btn btn-ghost" onClick={() => void signOut()}>
-              Đăng xuất
-            </button>
-          )}
-        </div>
-      </header>
+    <div className={`map-page mobile-${mobileView}`}>
+      <AppHeader />
 
       <FilterBar
         universities={universities}
@@ -56,34 +50,63 @@ export default function MapView() {
         matchCount={filtered.length}
       />
 
+      <nav className="mobile-view-toggle" aria-label="Chế độ xem">
+        <button
+          type="button"
+          className={mobileView === 'map' ? 'active' : ''}
+          onClick={() => setMobileView('map')}
+        >
+          🗺️ Bản đồ
+        </button>
+        <button
+          type="button"
+          className={mobileView === 'list' ? 'active' : ''}
+          onClick={() => setMobileView('list')}
+        >
+          📋 Danh sách
+        </button>
+      </nav>
+
       {error && <p className="form-error map-error">{error}</p>}
 
-      <div className="map-wrap">
-        <MapContainer center={KOREA_CENTER} zoom={KOREA_ZOOM} className="leaflet-host">
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <MarkerClusterGroup chunkedLoading maxClusterRadius={45}>
-            {filtered.map((u) => (
-              <Marker
-                key={u.id}
-                position={[u.lat, u.lng]}
-                eventHandlers={{ click: () => setSelected(u) }}
-              >
-                <Tooltip direction="top" offset={[-15, -10]}>
-                  <strong>{u.name_vi}</strong>
-                  <br />
-                  {u.city} · {u.type === 'public' ? 'Công lập' : 'Tư thục'}
-                </Tooltip>
-              </Marker>
-            ))}
-          </MarkerClusterGroup>
-        </MapContainer>
+      <div className="map-body">
+        <div className="map-wrap">
+          <MapContainer center={KOREA_CENTER} zoom={KOREA_ZOOM} className="leaflet-host">
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <MapController selected={selected} mobileView={mobileView} />
+            <MarkerClusterGroup chunkedLoading maxClusterRadius={45}>
+              {filtered.map((u) => (
+                <Marker
+                  key={u.id}
+                  position={[u.lat, u.lng]}
+                  eventHandlers={{ click: () => setSelected(u) }}
+                >
+                  <Tooltip permanent direction="top" offset={[-15, -10]} className="marker-label">
+                    {u.name_vi}
+                  </Tooltip>
+                </Marker>
+              ))}
+            </MarkerClusterGroup>
+          </MapContainer>
 
-        {selected && (
-          <DetailDrawer university={selected} onClose={() => setSelected(null)} />
-        )}
+          {selected && (
+            <DetailDrawer university={selected} onClose={() => setSelected(null)} />
+          )}
+        </div>
+
+        <SideList
+          universities={filtered}
+          selected={selected}
+          onSelect={(u) => {
+            setSelected(u);
+            setMobileView('map'); // on phones, jump to the map to show the school
+          }}
+          sort={sort}
+          onSortChange={setSort}
+        />
       </div>
     </div>
   );
