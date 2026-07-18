@@ -36,6 +36,11 @@ so every screen is browsable. Admin edits are kept in memory only.
 
 ## Going live with Supabase
 
+> **Production?** Follow **[PRODUCTION.md](PRODUCTION.md)** — a step-by-step runbook that
+> uses the consolidated one-shot script [`supabase/production_setup.sql`](supabase/production_setup.sql)
+> (schema + RLS + Storage in a single paste-and-run). The steps below are the same
+> flow in brief.
+
 1. **Create a project** at [supabase.com](https://supabase.com) (free tier).
 
 2. **Run the migration**: paste `supabase/migrations/0001_init.sql` into the
