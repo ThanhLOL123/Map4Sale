@@ -22,8 +22,20 @@ the two `VITE_SUPABASE_*` environment variables are set (see `src/lib/supabase.t
 
 ## 3. Deploy the Edge Functions
 These hold the service-role key and must run server-side (account creation,
-disable/reset, login logging). Install the [Supabase CLI](https://supabase.com/docs/guides/cli), then:
+disable/reset, login logging). `SUPABASE_URL`, `SUPABASE_ANON_KEY` and
+`SUPABASE_SERVICE_ROLE_KEY` are injected into functions automatically.
 
+**Option A — no computer needed (GitHub Actions, recommended).**
+1. Create a Supabase access token at
+   [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens).
+2. GitHub repo → **Settings → Secrets and variables → Actions → New repository
+   secret** → name `SUPABASE_ACCESS_TOKEN`, value = that token.
+3. GitHub **Actions** tab → *Deploy Edge Functions* → **Run workflow**. It deploys
+   all three. (It also auto-redeploys whenever you change a function on `main`.)
+   - The project ref is set in `.github/workflows/deploy-functions.yml`; if you
+     ever change projects, update `PROJECT_REF` there.
+
+**Option B — from a computer with the [Supabase CLI](https://supabase.com/docs/guides/cli):**
 ```bash
 supabase login
 supabase link --project-ref <your-project-ref>     # ref is in the project URL / settings
@@ -32,8 +44,9 @@ supabase functions deploy manage-user
 supabase functions deploy log-login
 ```
 
-`SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are injected
-into functions automatically — you don't set them.
+> These functions only power **creating sale accounts**, **disable/reset**, and
+> **login tracking**. The map, university management, images/videos, and backup
+> all work without them — so you can do steps 4–5 first and this afterward.
 
 ## 4. Point the frontend at Supabase (Vercel)
 - In Supabase → **Project Settings → API**, copy the **Project URL** and the
