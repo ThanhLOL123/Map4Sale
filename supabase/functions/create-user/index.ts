@@ -24,9 +24,15 @@ Deno.serve(async (req) => {
   }
 
   const admin = serviceClient();
-  // Invite flow: creates the auth user and emails a password-setup link.
-  const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
-    data: { full_name: full_name ?? '', role: 'sale' },
+  const password = generatePassword();
+  // No-email flow: creates the auth user with a random password and returns
+  // it once so the admin can hand it to the sales rep directly. Avoids
+  // Supabase's built-in mailer rate limit (~3-4 emails/hour).
+  const { data, error } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { full_name: full_name ?? '', role: 'sale' },
   });
   if (error) return json({ error: error.message }, 400);
 
@@ -37,5 +43,11 @@ Deno.serve(async (req) => {
     .update({ full_name: full_name ?? '' })
     .eq('id', data.user.id);
 
-  return json({ user_id: data.user.id });
+  return json({ user_id: data.user.id, password });
 });
+
+function generatePassword(): string {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(36).padStart(2, '0')).join('').slice(0, 16);
+}

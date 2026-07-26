@@ -150,15 +150,17 @@ export async function fetchProfiles(): Promise<Profile[]> {
   return data ?? [];
 }
 
-export async function createSaleAccount(email: string, fullName: string): Promise<void> {
+export async function createSaleAccount(email: string, fullName: string): Promise<string> {
   if (isDemoMode) {
     demoStore.createProfile(email, fullName);
-    return;
+    return 'demo-password';
   }
-  const { error } = await requireSupabase().functions.invoke('create-user', {
-    body: { email, full_name: fullName },
-  });
+  const { data, error } = await requireSupabase().functions.invoke<{ password: string }>(
+    'create-user',
+    { body: { email, full_name: fullName } },
+  );
   if (error) throw error;
+  return data!.password;
 }
 
 export async function setAccountActive(userId: string, isActive: boolean): Promise<void> {
@@ -172,12 +174,14 @@ export async function setAccountActive(userId: string, isActive: boolean): Promi
   if (error) throw error;
 }
 
-export async function resetAccountPassword(userId: string): Promise<void> {
-  if (isDemoMode) return;
-  const { error } = await requireSupabase().functions.invoke('manage-user', {
-    body: { action: 'reset_password', user_id: userId },
-  });
+export async function resetAccountPassword(userId: string): Promise<string> {
+  if (isDemoMode) return 'demo-password';
+  const { data, error } = await requireSupabase().functions.invoke<{ password: string }>(
+    'manage-user',
+    { body: { action: 'reset_password', user_id: userId } },
+  );
   if (error) throw error;
+  return data!.password;
 }
 
 // ---------------------------------------------------------------------------

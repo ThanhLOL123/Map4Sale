@@ -28,11 +28,11 @@ export default function AccountsPage() {
     setError(null);
     setMessage(null);
     try {
-      await createSaleAccount(email.trim(), fullName.trim());
+      const password = await createSaleAccount(email.trim(), fullName.trim());
       setMessage(
         isDemoMode
           ? 'Đã tạo tài khoản demo.'
-          : `Đã tạo tài khoản — email hướng dẫn đặt mật khẩu đã gửi tới ${email}.`,
+          : `Đã tạo tài khoản ${email}. Mật khẩu tạm thời: ${password} — hãy gửi mật khẩu này cho nhân viên (chỉ hiển thị một lần).`,
       );
       setEmail('');
       setFullName('');
@@ -56,13 +56,13 @@ export default function AccountsPage() {
   }
 
   async function onResetPassword(p: Profile) {
-    if (!window.confirm(`Gửi email đặt lại mật khẩu cho ${p.email}?`)) return;
+    if (!window.confirm(`Đặt lại mật khẩu cho ${p.email}?`)) return;
     try {
-      await resetAccountPassword(p.id);
+      const password = await resetAccountPassword(p.id);
       setMessage(
         isDemoMode
-          ? 'Chế độ demo: không gửi email thật.'
-          : `Đã gửi email đặt lại mật khẩu tới ${p.email}.`,
+          ? 'Chế độ demo: mật khẩu không thay đổi thật.'
+          : `Mật khẩu mới cho ${p.email}: ${password} — hãy gửi mật khẩu này cho nhân viên (chỉ hiển thị một lần).`,
       );
     } catch (err) {
       setError(String(err));

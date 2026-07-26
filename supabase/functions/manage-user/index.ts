@@ -1,7 +1,6 @@
-// Edge Function: disable / enable a sales account or trigger a password
-// reset (admin only). Uses the service-role key server-side (spec §4.3).
+// Edge Function: disable / enable a sales account or reset its password
+// (admin only). Uses the service-role key server-side (spec §4.3).
 
-import { createClient } from 'npm:@supabase/supabase-js@2';
 import {
   callerIsAdmin,
   corsHeaders,
@@ -55,16 +54,21 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
     case 'reset_password': {
-      // Sends the standard Supabase recovery email.
-      const anon = createClient(
-        Deno.env.get('SUPABASE_URL')!,
-        Deno.env.get('SUPABASE_ANON_KEY')!,
-      );
-      const { error } = await anon.auth.resetPasswordForEmail(target.email);
+      // No-email flow: sets a new random password and returns it once so
+      // the admin can hand it to the user directly (avoids the mailer's
+      // ~3-4 emails/hour rate limit).
+      const password = generatePassword();
+      const { error } = await admin.auth.admin.updateUserById(user_id, { password });
       if (error) return json({ error: error.message }, 400);
-      return json({ ok: true });
+      return json({ ok: true, password });
     }
     default:
       return json({ error: `Unknown action: ${action}` }, 400);
   }
 });
+
+function generatePassword(): string {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(36).padStart(2, '0')).join('').slice(0, 16);
+}
