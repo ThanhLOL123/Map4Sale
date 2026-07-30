@@ -9,6 +9,13 @@
   --danger: #dc2626;
   --success: #15803d;
   --warning-bg: #fef3c7;
+  /* Map-only accent (Naver-style green); the app brand stays blue. */
+  --map-accent: #03c75a;
+  --map-accent-dark: #02a34a;
+  --drawer-w: min(430px, 92vw);
+  --shadow-pin: 0 2px 6px rgb(0 0 0 / 0.3);
+  --shadow-float: 0 2px 10px rgb(0 0 0 / 0.15);
+  --ease-fast: 160ms ease;
   font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -291,22 +298,199 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 .important-notes-title { font-weight: 700; color: #92400e; font-size: 0.9rem; }
 .important-notes p { margin: 0.2rem 0 0; font-size: 0.9rem; }
 
-/* Always-visible marker name labels */
-.leaflet-tooltip.marker-label {
+/* ---------- map pins ---------- */
+/* Markers are divIcons built in schoolIcon.ts: a round logo head on a pointed
+   tail, with the school name inside the same icon so the two can never drift
+   apart. Leaflet sizes the icon box to 36x46; the label overflows it freely. */
+/* Leaflet gives the icon root position:absolute, so head and label are placed
+   against it rather than flowed — a flex column would squash the round head. */
+.leaflet-marker-icon.school-pin {
+  background: none;
+  border: none;
+}
+
+.school-pin-head {
+  position: absolute;
+  left: 50%;
+  bottom: 9px; /* leaves room for the tail below */
+  transform: translateX(-50%);
+  transform-origin: 50% calc(100% + 9px); /* scale about the tail tip */
+  width: 32px;
+  height: 32px;
+  padding: 2px; /* white ring so the type colour stays readable behind logos */
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--brand);
+  box-shadow: var(--shadow-pin);
+  /* Block, not grid: an auto grid track would size to the logo's intrinsic
+     width (sample logos are 128px) and blow the pin up. */
+  display: block;
+  /* Hover only: setIcon() rebuilds these nodes, so a selection transition
+     would never play — the selected state uses an animation instead. */
+  transition: box-shadow var(--ease-fast), filter var(--ease-fast);
+}
+.leaflet-marker-icon.school-pin:hover .school-pin-head { filter: brightness(1.06); }
+
+/* The tail, drawn below the head so the head can still clip its logo. */
+.school-pin-head::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-bottom: 0;
+  border-top: 9px solid var(--brand);
+}
+.school-pin-public .school-pin-head { border-color: var(--map-accent); }
+.school-pin-public .school-pin-head::after { border-top-color: var(--map-accent); }
+
+.school-pin-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface);
+}
+.school-pin-logo-placeholder {
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+
+.school-pin-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 3px;
+  max-width: 132px;
+  width: max-content;
+  padding: 1px 6px;
+  border-radius: 6px;
   background: rgb(255 255 255 / 0.92);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 1px 6px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
   font-size: 11px;
   font-weight: 600;
   color: var(--text);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
-  max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  pointer-events: none; /* never let a label steal a neighbouring pin's click */
 }
-.leaflet-tooltip.marker-label::before { display: none; } /* hide the little arrow */
+/* Names would collide at low zoom; MapController toggles this class. */
+.leaflet-host:not(.pins-labeled) .school-pin-label { display: none; }
+
+/* Selected school: bigger, accent-ringed, lifted (z-order via zIndexOffset).
+   Animated rather than transitioned — setIcon() replaces the icon's children,
+   and a transition never plays on a freshly inserted element. */
+@keyframes pin-pop {
+  0% { transform: translateX(-50%) scale(0.75); }
+  60% { transform: translateX(-50%) scale(1.32); }
+  100% { transform: translateX(-50%) scale(1.25); }
+}
+.school-pin-selected .school-pin-head {
+  transform: translateX(-50%) scale(1.25);
+  border-color: var(--map-accent);
+  box-shadow: 0 0 0 4px rgb(3 199 90 / 0.3), var(--shadow-pin);
+  animation: pin-pop 220ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+.school-pin-selected .school-pin-head::after { border-top-color: var(--map-accent); }
+.school-pin-selected .school-pin-label {
+  background: var(--map-accent);
+  border-color: var(--map-accent-dark);
+  color: #fff;
+}
+
+/* ---------- map clusters ---------- */
+.leaflet-marker-icon.school-cluster {
+  background: var(--map-accent);
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  box-shadow: 0 0 0 6px rgb(3 199 90 / 0.25), var(--shadow-pin);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 700;
+}
+.school-cluster-sm { font-size: 0.85rem; }
+.school-cluster-md { font-size: 0.95rem; }
+.school-cluster-lg { font-size: 1.05rem; }
+
+/* ---------- map controls & status ---------- */
+/* Rendered as siblings of the Leaflet container, so they sit above its panes
+   (400-700) but below the detail drawer (1000) and the filter sheet (1150+). */
+.map-controls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 800;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.map-control {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--ease-fast), color var(--ease-fast);
+}
+.map-control:hover { background: #f8fafc; color: var(--map-accent-dark); }
+.map-control svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+.map-status {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  font-size: 0.9rem;
+  color: var(--muted);
+  white-space: nowrap;
+  pointer-events: none; /* don't block panning the map underneath */
+}
+.map-status .btn { pointer-events: auto; }
+
+/* With the drawer open, keep both overlays inside the strip it leaves free. */
+.map-wrap.has-detail .map-controls { right: calc(var(--drawer-w) + 1rem); }
+.map-wrap.has-detail .map-status { left: calc(50% - var(--drawer-w) / 2); }
+.map-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--map-accent);
+  border-radius: 50%;
+  animation: map-spin 0.7s linear infinite;
+}
 
 /* Video embeds (detail panel) */
 .video-list-view { display: flex; flex-direction: column; gap: 0.6rem; }
@@ -348,7 +532,7 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   top: 0;
   right: 0;
   bottom: 0;
-  width: min(430px, 92vw);
+  width: var(--drawer-w);
   background: var(--surface);
   box-shadow: -8px 0 30px rgb(0 0 0 / 0.18);
   z-index: 1000;
@@ -557,6 +741,16 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   .map-page.mobile-list .map-wrap { display: none; }
   .side-list { width: 100%; border-left: none; }
 
+  /* Stay top-right: the bottom-right corner belongs to the attribution, and
+     the detail sheet (z-index 1000) correctly covers these when it opens. */
+  /* The sheet spans the full width, so the desktop side-shift must not leak. */
+  .map-controls,
+  .map-wrap.has-detail .map-controls { top: 0.6rem; right: 0.6rem; }
+  .map-wrap.has-detail .map-status { left: 50%; }
+  .map-control { width: 40px; height: 40px; }
+  .school-pin-label { max-width: 96px; font-size: 10px; }
+  .map-status { max-width: calc(100% - 2rem); white-space: normal; }
+
   .view-toggle-label { display: none; }
   .view-toggle a { padding: 0.3rem 0.6rem; }
   .list-scroll { padding: 0.5rem 0.75rem 1.5rem; }
@@ -638,4 +832,16 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 @keyframes sheet-up {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
+}
+
+@keyframes map-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .school-pin-head,
+  .map-control { transition: none; }
+  .detail-drawer,
+  .school-pin-selected .school-pin-head { animation: none; }
+  .map-spinner { animation-duration: 2s; }
 }

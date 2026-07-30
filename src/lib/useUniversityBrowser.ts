@@ -9,6 +9,7 @@ import type { University } from './types';
  */
 export function useUniversityBrowser() {
   const [universities, setUniversities] = useState<University[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<UniversityFilters>(EMPTY_FILTERS);
   const [selected, setSelected] = useState<University | null>(null);
@@ -16,7 +17,8 @@ export function useUniversityBrowser() {
   useEffect(() => {
     fetchUniversities()
       .then(setUniversities)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Không tải được dữ liệu.'));
+      .catch((err) => setError(err instanceof Error ? err.message : 'Không tải được dữ liệu.'))
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = useMemo(
@@ -24,5 +26,5 @@ export function useUniversityBrowser() {
     [universities, filters],
   );
 
-  return { universities, filtered, error, filters, setFilters, selected, setSelected };
+  return { universities, filtered, loading, error, filters, setFilters, selected, setSelected };
 }

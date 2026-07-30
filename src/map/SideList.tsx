@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { parseTuitionMillions } from '../lib/filters';
 import type { University } from '../lib/types';
 
@@ -32,6 +32,12 @@ interface Props {
 /** Docked, scrollable compact-rows list beside the map. */
 export default function SideList({ universities, selected, onSelect, sort, onSortChange }: Props) {
   const rows = useMemo(() => sortUniversities(universities, sort), [universities, sort]);
+  const activeRow = useRef<HTMLButtonElement>(null);
+
+  // Picking a school on the map should reveal its row here too.
+  useEffect(() => {
+    activeRow.current?.scrollIntoView({ block: 'nearest' });
+  }, [selected?.id]);
 
   return (
     <div className="side-list">
@@ -53,6 +59,7 @@ export default function SideList({ universities, selected, onSelect, sort, onSor
             <li key={u.id}>
               <button
                 type="button"
+                ref={selected?.id === u.id ? activeRow : null}
                 className={`uni-row${selected?.id === u.id ? ' uni-row-active' : ''}`}
                 onClick={() => onSelect(u)}
               >
