@@ -16,6 +16,11 @@
   --shadow-pin: 0 2px 6px rgb(0 0 0 / 0.3);
   --shadow-float: 0 2px 10px rgb(0 0 0 / 0.15);
   --ease-fast: 160ms ease;
+  /* Basemap cross-fade between the vector province view and the street tiles. */
+  --ease-map: 250ms ease;
+  --sea: #dfeaf6;
+  --land: #ffffff;
+  --province-line: #b9c9dc;
   font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -273,7 +278,9 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 /* Map on the left, docked list panel on the right. */
 .map-body { flex: 1; min-height: 0; display: flex; }
 .map-wrap { position: relative; flex: 1; min-height: 0; min-width: 0; }
-.leaflet-host { height: 100%; width: 100%; }
+/* The sea shows through wherever the province polygons don't reach; it is only
+   visible while the street tiles are faded out (see the province layer below). */
+.leaflet-host { height: 100%; width: 100%; background: var(--sea); }
 
 .side-list {
   width: 360px;
@@ -297,6 +304,51 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 }
 .important-notes-title { font-weight: 700; color: #92400e; font-size: 0.9rem; }
 .important-notes p { margin: 0.2rem 0 0; font-size: 0.9rem; }
+
+/* ---------- province layer ---------- */
+/* The 17 administrative divisions from korea-provinces.json, drawn under the
+   pins by ProvinceLayer.tsx. `.provinces-solo` — set by MapController at zoom
+   <= PROVINCE_SOLO_MAX_ZOOM — is the vector view: the street tiles fade out and
+   the divisions carry their own names. Above that zoom the tiles fade back in
+   and the provinces stay on as thin outlines. */
+
+/* CSS beats the presentation attributes Leaflet writes onto each path, so the
+   whole layer restyles by class without going back through PathOptions. */
+.province-shape {
+  fill: var(--land);
+  fill-opacity: 0;
+  stroke: var(--province-line);
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+  transition: fill-opacity var(--ease-map);
+}
+.provinces-solo .province-shape { fill-opacity: 1; }
+
+/* The tiles stay mounted and merely fade, so coming back to the vector view is
+   instant and Leaflet never re-requests tiles it already holds. */
+.leaflet-host .leaflet-tile-pane { transition: opacity var(--ease-map); }
+.provinces-solo .leaflet-tile-pane { opacity: 0; }
+
+/* Zero-size icon box sits exactly on the coordinate; the inner span centres
+   itself on that point, whatever width the name turns out to be. */
+.leaflet-marker-icon.province-label { background: none; border: none; }
+.province-label-text {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  pointer-events: none;
+  font-size: 12px;
+  /* White halo keeps names legible where they cross a border or the coast. */
+  text-shadow: 0 0 3px var(--land), 0 0 3px var(--land), 0 0 2px var(--land);
+  opacity: 0;
+  transition: opacity var(--ease-map);
+}
+.provinces-solo .province-label-text { opacity: 1; }
+
+.province-label-province .province-label-text { color: #5b6b7f; font-weight: 500; }
+.province-label-city .province-label-text { color: #2c3a4a; font-weight: 700; }
 
 /* ---------- map pins ---------- */
 /* Markers are divIcons built in schoolIcon.ts: a round logo head on a pointed
@@ -749,6 +801,8 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   .map-wrap.has-detail .map-status { left: 50%; }
   .map-control { width: 40px; height: 40px; }
   .school-pin-label { max-width: 96px; font-size: 10px; }
+  /* 12px province names crowd the whole peninsula on a phone-width map. */
+  .province-label-text { font-size: 10px; }
   .map-status { max-width: calc(100% - 2rem); white-space: normal; }
 
   .view-toggle-label { display: none; }
@@ -840,6 +894,9 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 
 @media (prefers-reduced-motion: reduce) {
   .school-pin-head,
+  .province-shape,
+  .province-label-text,
+  .leaflet-host .leaflet-tile-pane,
   .map-control { transition: none; }
   .detail-drawer,
   .school-pin-selected .school-pin-head { animation: none; }

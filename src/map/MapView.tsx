@@ -9,6 +9,7 @@ import type { University } from '../lib/types';
 import DetailDrawer from './DetailDrawer';
 import FilterBar from './FilterBar';
 import MapControls from './MapControls';
+import ProvinceLayer from './ProvinceLayer';
 import SideList, { type SortKey } from './SideList';
 import { createClusterIcon, createSchoolIcon } from './schoolIcon';
 import './leafletIcon';
@@ -21,6 +22,11 @@ const HOME_VIEW = { center: KOREA_CENTER as L.LatLngExpression, zoom: KOREA_ZOOM
 /** Pin name labels only appear once the pins have room to breathe. Below this
  *  the Seoul cluster (14 of 22 schools) overlaps into an unreadable stack. */
 const LABEL_MIN_ZOOM = 11;
+/** At or below this zoom the map is the vector province map — street tiles are
+ *  faded out and the divisions carry their own names. Above it the tiles fade
+ *  back in and the provinces drop to plain outlines. Because this sits well
+ *  below LABEL_MIN_ZOOM, province names and school names are never both up. */
+const PROVINCE_SOLO_MAX_ZOOM = 8;
 /** Keep in sync with the --drawer-w token in app.css. */
 const DRAWER_WIDTH = 430;
 /** Matches the single CSS breakpoint; below it the drawer is a bottom sheet. */
@@ -53,10 +59,14 @@ function MapController({ selected, mobileView }: { selected: University | null; 
     map.flyTo(center, zoom, { duration: 0.6 });
   }, [selected, map]);
 
-  // Toggling one container class beats re-rendering every marker on each zoom.
+  // Toggling container classes beats re-rendering every marker on each zoom.
   useEffect(() => {
-    const sync = () =>
-      map.getContainer().classList.toggle('pins-labeled', map.getZoom() >= LABEL_MIN_ZOOM);
+    const sync = () => {
+      const zoom = map.getZoom();
+      const classes = map.getContainer().classList;
+      classes.toggle('pins-labeled', zoom >= LABEL_MIN_ZOOM);
+      classes.toggle('provinces-solo', zoom <= PROVINCE_SOLO_MAX_ZOOM);
+    };
     sync();
     map.on('zoomend', sync);
     return () => {
@@ -150,10 +160,11 @@ export default function MapView() {
             className="leaflet-host"
           >
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a> | Ranh giới hành chính: <a href="https://kostat.go.kr">KOSTAT</a>'
               url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
               maxZoom={20}
             />
+            <ProvinceLayer />
             <MapController selected={selected} mobileView={mobileView} />
             <MarkerClusterGroup
               chunkedLoading
