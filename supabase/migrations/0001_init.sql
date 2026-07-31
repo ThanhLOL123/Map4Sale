@@ -116,24 +116,29 @@ alter table public.profiles enable row level security;
 alter table public.login_logs enable row level security;
 
 -- universities: any *active* authenticated user reads; only admins write.
+drop policy if exists "active_users_read_universities" on public.universities;
 create policy "active_users_read_universities" on public.universities
   for select to authenticated
   using (public.is_active_user());
 
+drop policy if exists "admin_write_universities" on public.universities;
 create policy "admin_write_universities" on public.universities
   for all to authenticated
   using (public.is_admin())
   with check (public.is_admin());
 
 -- profiles: users see their own row; admins see and manage all.
+drop policy if exists "own_profile_read" on public.profiles;
 create policy "own_profile_read" on public.profiles
   for select to authenticated
   using (id = auth.uid());
 
+drop policy if exists "admin_read_profiles" on public.profiles;
 create policy "admin_read_profiles" on public.profiles
   for select to authenticated
   using (public.is_admin());
 
+drop policy if exists "admin_update_profiles" on public.profiles;
 create policy "admin_update_profiles" on public.profiles
   for update to authenticated
   using (public.is_admin())
@@ -141,6 +146,7 @@ create policy "admin_update_profiles" on public.profiles
 
 -- login_logs: admin read only. Rows are inserted by the log-login Edge
 -- Function with the service-role key, which bypasses RLS.
+drop policy if exists "admin_read_logs" on public.login_logs;
 create policy "admin_read_logs" on public.login_logs
   for select to authenticated
   using (public.is_admin());
@@ -153,18 +159,22 @@ insert into storage.buckets (id, name, public)
 values ('university-images', 'university-images', true)
 on conflict (id) do nothing;
 
+drop policy if exists "public_read_university_images" on storage.objects;
 create policy "public_read_university_images" on storage.objects
   for select
   using (bucket_id = 'university-images');
 
+drop policy if exists "admin_insert_university_images" on storage.objects;
 create policy "admin_insert_university_images" on storage.objects
   for insert to authenticated
   with check (bucket_id = 'university-images' and public.is_admin());
 
+drop policy if exists "admin_update_university_images" on storage.objects;
 create policy "admin_update_university_images" on storage.objects
   for update to authenticated
   using (bucket_id = 'university-images' and public.is_admin());
 
+drop policy if exists "admin_delete_university_images" on storage.objects;
 create policy "admin_delete_university_images" on storage.objects
   for delete to authenticated
   using (bucket_id = 'university-images' and public.is_admin());
