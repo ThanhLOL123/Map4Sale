@@ -54,6 +54,11 @@ supabase functions deploy log-login
 - In Vercel → your project → **Settings → Environment Variables**, add (Production):
   - `VITE_SUPABASE_URL` = the Project URL
   - `VITE_SUPABASE_ANON_KEY` = the anon public key
+  - *(optional)* `VITE_MAPBOX_TOKEN` = a Mapbox public token (`pk.…`) to enable
+    the satellite basemap toggle. Omit it and the map simply has no satellite
+    button. Restrict the token to your domains in the Mapbox dashboard — it
+    ships in the client bundle. Note that from Leaflet, Mapbox bills per **tile
+    request**, not per map load, so watch usage in the first month.
 - **Redeploy** (Deployments → ⋯ → Redeploy). The app now runs live — the
   yellow **DEMO** badge disappears and login is required.
 

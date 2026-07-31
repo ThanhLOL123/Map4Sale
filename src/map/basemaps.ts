@@ -1,0 +1,68 @@
+/**
+ * The two basemaps the map can show, and whether satellite is configured.
+ *
+ * Satellite needs a Mapbox token, so — following the rule `src/lib/supabase.ts`
+ * already sets for Supabase credentials — its absence is a supported state
+ * rather than an error: with no token the app never offers the satellite
+ * option and behaves exactly as it did before. Demo mode stays fully browsable
+ * with no accounts of any kind.
+ */
+
+const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
+
+/** False when VITE_MAPBOX_TOKEN is unset; the satellite toggle is then hidden. */
+export const satelliteAvailable = Boolean(mapboxToken);
+
+export type Basemap = 'street' | 'satellite';
+
+export interface BasemapSpec {
+  url: string;
+  attribution: string;
+  maxZoom: number;
+  /**
+   * Both are required, never optional. react-leaflet forwards props straight
+   * into Leaflet's options, and an explicit `undefined` *overwrites* Leaflet's
+   * own default rather than falling back to it — a `tileSize: undefined` makes
+   * Leaflet try to load an infinite number of tiles.
+   */
+  tileSize: number;
+  zoomOffset: number;
+}
+
+const KOSTAT_CREDIT = 'Ranh giới hành chính: <a href="https://kostat.go.kr">KOSTAT</a>';
+
+const STREET: BasemapSpec = {
+  url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors ' +
+    `&copy; <a href="https://carto.com/attributions">CARTO</a> | ${KOSTAT_CREDIT}`,
+  maxZoom: 20,
+  tileSize: 256,
+  zoomOffset: 0,
+};
+
+/**
+ * satellite-streets rather than plain satellite: bare imagery carries no road
+ * or place names, which is disorienting next to the street basemap.
+ *
+ * tileSize and zoomOffset must be set together. Without them Leaflet requests
+ * one zoom level too low and the imagery renders subtly soft — it reads as poor
+ * imagery rather than a bug, which makes it easy to ship by accident.
+ */
+const SATELLITE: BasemapSpec = {
+  url:
+    'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/tiles/{z}/{x}/{y}' +
+    `?access_token=${mapboxToken ?? ''}`,
+  attribution:
+    '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+    `| ${KOSTAT_CREDIT}`,
+  maxZoom: 19,
+  tileSize: 512,
+  zoomOffset: -1,
+};
+
+export const BASEMAPS: Record<Basemap, BasemapSpec> = {
+  street: STREET,
+  satellite: SATELLITE,
+};

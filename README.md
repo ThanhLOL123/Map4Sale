@@ -68,7 +68,10 @@ so every screen is browsable. Admin edits are kept in memory only.
    ```
 
 5. **Configure the frontend**: copy `.env.example` to `.env` and fill in
-   `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+   `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Optionally set
+   `VITE_MAPBOX_TOKEN` to a Mapbox public token to enable the satellite
+   basemap toggle — without it the map has no satellite button and everything
+   else behaves normally.
 
 6. **Load data**: sign in as the admin and add universities through
    *Quản trị → Trường đại học* (the sample dataset in

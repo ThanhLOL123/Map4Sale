@@ -350,6 +350,16 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 .province-label-province .province-label-text { color: #5b6b7f; font-weight: 500; }
 .province-label-city .province-label-text { color: #2c3a4a; font-weight: 700; }
 
+/* Satellite opts out of the vector province view: the imagery is the whole
+   point, so tiles stay up at every zoom and the divisions drop to outlines.
+   Province names are dropped too — satellite-streets carries its own place
+   labels and ours would sit on top of them.
+   These must follow the .provinces-solo rules above: the selectors have equal
+   specificity and both classes land on the same element, so order decides. */
+.basemap-satellite .leaflet-tile-pane { opacity: 1; }
+.basemap-satellite .province-shape { fill-opacity: 0; stroke: rgb(255 255 255 / 0.55); }
+.basemap-satellite .province-label-text { opacity: 0; }
+
 /* ---------- map pins ---------- */
 /* Markers are divIcons built in schoolIcon.ts: a round logo head on a pointed
    tail, with the school name inside the same icon so the two can never drift
@@ -503,6 +513,9 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   transition: background var(--ease-fast), color var(--ease-fast);
 }
 .map-control:hover { background: #f8fafc; color: var(--map-accent-dark); }
+/* Basemap toggle while satellite is showing. */
+.map-control-active,
+.map-control-active:hover { background: var(--map-accent); color: #fff; }
 .map-control svg {
   width: 20px;
   height: 20px;

@@ -3,6 +3,7 @@ import L, { type Map as LeafletMap } from 'leaflet';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import AppHeader from '../components/AppHeader';
+import { BASEMAPS, type Basemap } from './basemaps';
 import { EMPTY_FILTERS } from '../lib/filters';
 import { useUniversityBrowser } from '../lib/useUniversityBrowser';
 import type { University } from '../lib/types';
@@ -39,7 +40,15 @@ type MobileView = 'map' | 'list';
  * re-measures the map after it becomes visible again on mobile (Leaflet
  * mis-sizes when its container was display:none).
  */
-function MapController({ selected, mobileView }: { selected: University | null; mobileView: MobileView }) {
+function MapController({
+  selected,
+  mobileView,
+  basemap,
+}: {
+  selected: University | null;
+  mobileView: MobileView;
+  basemap: Basemap;
+}) {
   const map = useMap();
 
   useEffect(() => {
@@ -73,6 +82,12 @@ function MapController({ selected, mobileView }: { selected: University | null; 
       map.off('zoomend', sync);
     };
   }, [map]);
+
+  // Satellite is an explicit request to see imagery, so it opts out of the
+  // vector province view: the tiles stay up at every zoom (see app.css).
+  useEffect(() => {
+    map.getContainer().classList.toggle('basemap-satellite', basemap === 'satellite');
+  }, [basemap, map]);
 
   useEffect(() => {
     if (mobileView === 'map') setTimeout(() => map.invalidateSize(), 0);
@@ -115,6 +130,8 @@ export default function MapView() {
   const [sort, setSort] = useState<SortKey>('ranking');
   const [mobileView, setMobileView] = useState<MobileView>('map');
   const [map, setMap] = useState<LeafletMap | null>(null);
+  const [basemap, setBasemap] = useState<Basemap>('street');
+  const tiles = BASEMAPS[basemap];
 
   const noneAtAll = !loading && !error && universities.length === 0;
   const noneMatching = !loading && !error && universities.length > 0 && filtered.length === 0;
@@ -159,13 +176,18 @@ export default function MapView() {
             zoomControl={false} // replaced by <MapControls />
             className="leaflet-host"
           >
+            {/* Keyed on the basemap: react-leaflet cannot swap a tile layer's
+                url and tileSize in place, so the layer is remounted instead. */}
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a> | Ranh giới hành chính: <a href="https://kostat.go.kr">KOSTAT</a>'
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-              maxZoom={20}
+              key={basemap}
+              attribution={tiles.attribution}
+              url={tiles.url}
+              maxZoom={tiles.maxZoom}
+              tileSize={tiles.tileSize}
+              zoomOffset={tiles.zoomOffset}
             />
             <ProvinceLayer />
-            <MapController selected={selected} mobileView={mobileView} />
+            <MapController selected={selected} mobileView={mobileView} basemap={basemap} />
             <MarkerClusterGroup
               chunkedLoading
               maxClusterRadius={45}
@@ -183,7 +205,12 @@ export default function MapView() {
             </MarkerClusterGroup>
           </MapContainer>
 
-          <MapControls map={map} home={HOME_VIEW} />
+          <MapControls
+            map={map}
+            home={HOME_VIEW}
+            basemap={basemap}
+            onBasemapChange={setBasemap}
+          />
 
           {loading && (
             <div className="map-status" role="status">
