@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapbox Satellite — demo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root { --ok:#15803d; --bad:#dc2626; --line:#e2e8f0; --muted:#6b7280; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#1f2937; }
+  body { display:flex; flex-direction:column; }
+  header { padding:.6rem .9rem; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+  header h1 { font-size:1rem; margin:0 .5rem 0 0; }
+  input[type=text] { padding:.4rem .6rem; border:1px solid var(--line); border-radius:8px; min-width:300px; font:inherit; }
+  button { padding:.4rem .7rem; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; font:inherit; }
+  button:hover { background:#f8fafc; }
+  button.on { background:#1d4ed8; color:#fff; border-color:#1d4ed8; }
+  .row { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; padding:.45rem .9rem; border-bottom:1px solid var(--line); }
+  .row b { font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin-right:.3rem; }
+  main { flex:1; display:flex; min-height:0; }
+  #map { flex:1; min-width:0; background:#dfeaf6; }
+  #panel { width:390px; flex-shrink:0; border-left:1px solid var(--line); overflow:auto; padding:.8rem; font-size:.86rem; }
+  #panel h2 { font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:1rem 0 .35rem; }
+  #panel h2:first-child { margin-top:0; }
+  .stat { display:flex; justify-content:space-between; gap:.5rem; padding:.2rem 0; border-bottom:1px dashed var(--line); }
+  .stat span:last-child { text-align:right; word-break:break-all; }
+  .ok { color:var(--ok); font-weight:700; }
+  .bad { color:var(--bad); font-weight:700; }
+  #verdict { padding:.6rem; border-radius:8px; background:#f8fafc; border:1px solid var(--line); line-height:1.45; }
+  code, #failurl, #probe { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.76rem; word-break:break-all; }
+  #failurl, #probe { display:block; background:#f8fafc; border:1px solid var(--line); border-radius:6px; padding:.4rem; margin-top:.3rem; }
+  ol { margin:.3rem 0; padding-left:1.1rem; line-height:1.5; }
+  .hint { color:var(--muted); font-size:.8rem; line-height:1.45; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mapbox Satellite test</h1>
+  <input type="text" id="token" placeholder="Paste your Mapbox public token (pk.…)" autocomplete="off">
+  <button id="load">Load</button>
+  <span class="hint">Free token: <b>account.mapbox.com</b> → Access tokens → default public token</span>
+</header>
+
+<div class="row">
+  <b>Layer</b>
+  <button data-layer="mapbox/satellite-streets-v12" class="on">Satellite + Streets</button>
+  <button data-layer="mapbox/satellite-v9">Satellite (no labels)</button>
+  <button data-layer="carto">CARTO (control)</button>
+</div>
+
+<div class="row">
+  <b>Go to</b>
+  <button data-at="37.4599,126.9519,16">Seoul National</button>
+  <button data-at="37.5665,126.9387,16">Yonsei</button>
+  <button data-at="36.3721,127.3604,16">KAIST</button>
+  <button data-at="36.0136,129.3223,16">POSTECH</button>
+  <button data-at="37.5665,126.978,11">Seoul (wide)</button>
+</div>
+
+<main>
+  <div id="map"></div>
+  <aside id="panel">
+    <h2>Result</h2>
+    <div id="verdict">Paste a token and press <b>Load</b>.</div>
+
+    <h2>Tiles</h2>
+    <div class="stat"><span>Loaded</span><span id="nOk" class="ok">0</span></div>
+    <div class="stat"><span>Failed</span><span id="nBad" class="bad">0</span></div>
+    <div class="stat"><span>Layer</span><span id="curLayer">satellite-streets-v12</span></div>
+    <div class="stat"><span>Zoom</span><span id="curZoom">–</span></div>
+
+    <h2>Direct tile probe</h2>
+    <div id="probe">—</div>
+
+    <h2>First failing URL</h2>
+    <div id="failurl">—</div>
+
+    <h2>What to check</h2>
+    <ol>
+      <li>Satellite tiles appear over a campus at zoom 16+.</li>
+      <li>They load <b>acceptably fast from Vietnam</b> — the question VWorld failed.</li>
+      <li>Imagery stays sharp as you zoom; find the real ceiling.</li>
+      <li>Satellite + Streets labels are legible.</li>
+    </ol>
+    <p class="hint">Billing note: from Leaflet, Mapbox charges per <b>tile request</b>, not per map load. The "Loaded" count above is the billable unit.</p>
+  </aside>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function () {
+  var STORE = 'mapbox-demo-token';
+
+  var state = {
+    token: localStorage.getItem(STORE) || '',
+    layer: 'mapbox/satellite-streets-v12',
+  };
+  var counts = { ok: 0, bad: 0, firstFail: null };
+  var base = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  $('token').value = state.token;
+
+  var map = L.map('map', { center: [37.4599, 126.9519], zoom: 16, minZoom: 3, maxZoom: 19 });
+
+  var CARTO = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+  function tileUrl(id) {
+    return 'https://api.mapbox.com/styles/v1/' + id + '/tiles/{z}/{x}/{y}?access_token=' + state.token;
+  }
+
+  function rebuild() {
+    counts = { ok: 0, bad: 0, firstFail: null };
+    if (base) map.removeLayer(base);
+
+    var isCarto = state.layer === 'carto';
+    var opts = isCarto
+      ? { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors &copy; CARTO' }
+      : {
+          maxZoom: 19,
+          // Both are required with the Styles API. Without them Leaflet asks for
+          // the wrong zoom level and the imagery renders one step too coarse —
+          // which looks like blurry satellite rather than a bug.
+          tileSize: 512,
+          zoomOffset: -1,
+          attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; OpenStreetMap',
+        };
+
+    base = L.tileLayer(isCarto ? CARTO : tileUrl(state.layer), opts);
+    base.on('tileload', function () { counts.ok++; render(); });
+    base.on('tileerror', function (e) {
+      counts.bad++;
+      if (!counts.firstFail) counts.firstFail = (e.tile && e.tile.src) || '(no src)';
+      render();
+    });
+    base.addTo(map);
+    render();
+  }
+
+  // Leaflet's tileerror gives no HTTP status, so fetch one tile directly.
+  // Mapbox returns a readable JSON body on failure, which names the cause exactly.
+  function probe() {
+    if (state.layer === 'carto') { $('probe').textContent = 'n/a for CARTO control'; return; }
+    if (!state.token) { $('probe').textContent = 'no token yet'; return; }
+    var url = tileUrl(state.layer).replace('{z}', '16').replace('{x}', '55878').replace('{y}', '25406');
+    $('probe').textContent = 'checking…';
+    fetch(url).then(function (r) {
+      if (r.ok) { $('probe').textContent = 'HTTP ' + r.status + ' — tile served OK'; return; }
+      return r.text().then(function (body) {
+        $('probe').textContent = 'HTTP ' + r.status + ' — ' + body.slice(0, 160);
+      });
+    }).catch(function (err) {
+      $('probe').textContent = 'request blocked: ' + err.message +
+        ' (network, firewall or CORS — not necessarily Mapbox)';
+    });
+  }
+
+  function render() {
+    $('nOk').textContent = counts.ok;
+    $('nBad').textContent = counts.bad;
+    $('curLayer').textContent = state.layer.replace('mapbox/', '');
+    $('curZoom').textContent = map.getZoom();
+    $('failurl').textContent = counts.firstFail
+      ? counts.firstFail.replace(/access_token=[^&]+/, 'access_token=…')
+      : '—';
+    $('verdict').innerHTML = verdict();
+  }
+
+  function verdict() {
+    if (!state.token && state.layer !== 'carto') {
+      return 'No token yet. Paste a public <code>pk.…</code> token above — every tile 401s without one.';
+    }
+    if (counts.ok === 0 && counts.bad === 0) return 'Waiting for tiles…';
+
+    if (counts.ok > 0 && counts.bad === 0) {
+      return '<b class="ok">Working.</b> ' + counts.ok + ' tiles loaded. ' +
+        (state.layer === 'carto'
+          ? 'That is the control layer — now try a Mapbox layer.'
+          : 'Mapbox Satellite serves to this machine. Check speed and sharpness next.');
+    }
+    if (counts.ok > 0 && counts.bad > 0) {
+      return '<b>Partial.</b> ' + counts.ok + ' ok / ' + counts.bad + ' failed. ' +
+        'Usually means you zoomed past the imagery ceiling, or a few requests timed out.';
+    }
+    return '<b class="bad">All tiles failed.</b> Read the probe above: ' +
+      '<b>401</b> = bad or missing token · <b>403</b> = token URL-restricted to another domain ' +
+      '(this page is ' + location.origin + ') · <b>429</b> = over quota. ' +
+      'If the <b>CARTO control</b> also fails, the problem is your network, not Mapbox.';
+  }
+
+  document.querySelectorAll('[data-layer]').forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll('[data-layer]').forEach(function (o) { o.classList.remove('on'); });
+      b.classList.add('on');
+      state.layer = b.dataset.layer;
+      rebuild();
+      probe();
+    };
+  });
+
+  document.querySelectorAll('[data-at]').forEach(function (b) {
+    b.onclick = function () {
+      var p = b.dataset.at.split(',');
+      map.setView([+p[0], +p[1]], +p[2]);
+    };
+  });
+
+  $('load').onclick = function () {
+    state.token = $('token').value.trim();
+    localStorage.setItem(STORE, state.token);
+    rebuild();
+    probe();
+  };
+
+  map.on('zoomend', render);
+  rebuild();
+  probe();
+})();
+</script>
+</body>
+</html>
