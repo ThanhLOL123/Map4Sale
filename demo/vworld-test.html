@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VWorld satellite — diagnostic demo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root { --ok:#15803d; --bad:#dc2626; --line:#e2e8f0; --muted:#6b7280; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#1f2937; }
+  body { display:flex; flex-direction:column; }
+  header { padding:.6rem .9rem; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+  header h1 { font-size:1rem; margin:0 .5rem 0 0; }
+  input[type=text] { padding:.4rem .6rem; border:1px solid var(--line); border-radius:8px; min-width:270px; font:inherit; }
+  button { padding:.4rem .7rem; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; font:inherit; }
+  button:hover { background:#f8fafc; }
+  button.on { background:#1d4ed8; color:#fff; border-color:#1d4ed8; }
+  .row { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; padding:.45rem .9rem; border-bottom:1px solid var(--line); }
+  .row b { font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin-right:.3rem; }
+  main { flex:1; display:flex; min-height:0; }
+  #map { flex:1; min-width:0; background:#dfeaf6; }
+  #panel { width:390px; flex-shrink:0; border-left:1px solid var(--line); overflow:auto; padding:.8rem; font-size:.86rem; }
+  #panel h2 { font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:1rem 0 .35rem; }
+  #panel h2:first-child { margin-top:0; }
+  .stat { display:flex; justify-content:space-between; padding:.2rem 0; border-bottom:1px dashed var(--line); }
+  .ok { color:var(--ok); font-weight:700; }
+  .bad { color:var(--bad); font-weight:700; }
+  #verdict { padding:.6rem; border-radius:8px; background:#f8fafc; border:1px solid var(--line); line-height:1.45; }
+  code, #failurl { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.76rem; word-break:break-all; }
+  #failurl { display:block; background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:.4rem; margin-top:.3rem; }
+  ol { margin:.3rem 0; padding-left:1.1rem; line-height:1.5; }
+  .hint { color:var(--muted); font-size:.8rem; line-height:1.45; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>VWorld satellite test</h1>
+  <input type="text" id="key" placeholder="Paste your VWorld API key…" autocomplete="off">
+  <button id="load">Load</button>
+  <span class="hint">Free key: vworld.kr → 오픈API → 인증키 발급 (register <code>http://localhost</code>)</span>
+</header>
+
+<div class="row">
+  <b>Layer</b>
+  <button data-layer="Satellite" class="on">Satellite</button>
+  <button data-layer="Base">Base</button>
+  <button data-layer="gray">Gray</button>
+  <button data-layer="carto">CARTO (control)</button>
+  <button id="hybrid">+ Hybrid labels</button>
+</div>
+
+<div class="row">
+  <b>Scheme</b>
+  <button data-scheme="https" class="on">HTTPS</button>
+  <button data-scheme="http">HTTP</button>
+  <b style="margin-left:.8rem">Go to</b>
+  <button data-at="37.4599,126.9519,16">Seoul National</button>
+  <button data-at="37.5665,126.9387,16">Yonsei</button>
+  <button data-at="36.3721,127.3604,16">KAIST</button>
+  <button data-at="36.0136,129.3223,16">POSTECH</button>
+  <button data-at="35.6762,139.6503,13">Tokyo (outside KR)</button>
+</div>
+
+<main>
+  <div id="map"></div>
+  <aside id="panel">
+    <h2>Result</h2>
+    <div id="verdict">Paste a key and press <b>Load</b>.</div>
+
+    <h2>Tiles</h2>
+    <div class="stat"><span>Loaded</span><span id="nOk" class="ok">0</span></div>
+    <div class="stat"><span>Failed</span><span id="nBad" class="bad">0</span></div>
+    <div class="stat"><span>Layer</span><span id="curLayer">Satellite</span></div>
+    <div class="stat"><span>Scheme</span><span id="curScheme">https</span></div>
+    <div class="stat"><span>Zoom</span><span id="curZoom">–</span></div>
+
+    <h2>First failing URL</h2>
+    <div id="failurl">—</div>
+
+    <h2>What to check</h2>
+    <ol>
+      <li>Satellite tiles appear over a campus at zoom 16+.</li>
+      <li><b>HTTPS works.</b> If only HTTP does, VWorld can't be used on Vercel.</li>
+      <li><code>localhost</code> is accepted as the registered origin.</li>
+      <li>Imagery stays sharp as you zoom — find the real ceiling.</li>
+      <li>Hybrid puts readable labels over Satellite.</li>
+    </ol>
+    <p class="hint">Tokyo should fail — VWorld is Korea-only. That is a correct result, not a bug.</p>
+  </aside>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function () {
+  var KEY_STORE = 'vworld-demo-key';
+
+  var state = {
+    key: localStorage.getItem(KEY_STORE) || '',
+    layer: 'Satellite',
+    scheme: 'https',
+    hybrid: false,
+  };
+
+  var counts = { ok: 0, bad: 0, firstFail: null };
+  var base = null, hybridLayer = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  $('key').value = state.key;
+
+  var map = L.map('map', { center: [37.4599, 126.9519], zoom: 16, minZoom: 5, maxZoom: 19 });
+
+  // VWorld's WMTS path is {z}/{y}/{x} — NOT Leaflet's usual {z}/{x}/{y}.
+  // Leaflet substitutes by name, so this template is correct as written;
+  // transposing y and x yields plausible-looking but wrong tiles.
+  function vworldUrl(layer) {
+    var ext = layer === 'Satellite' ? 'jpeg' : 'png';
+    return state.scheme + '://api.vworld.kr/req/wmts/1.0.0/' + state.key +
+           '/' + layer + '/{z}/{y}/{x}.' + ext;
+  }
+
+  var CARTO = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+  function track(layer) {
+    layer.on('tileload', function () { counts.ok++; render(); });
+    layer.on('tileerror', function (e) {
+      counts.bad++;
+      if (!counts.firstFail) counts.firstFail = (e.tile && e.tile.src) || '(no src)';
+      render();
+    });
+    return layer;
+  }
+
+  function rebuild() {
+    counts = { ok: 0, bad: 0, firstFail: null };
+    if (base) map.removeLayer(base);
+    if (hybridLayer) { map.removeLayer(hybridLayer); hybridLayer = null; }
+
+    var url = state.layer === 'carto' ? CARTO : vworldUrl(state.layer);
+    base = track(L.tileLayer(url, {
+      maxZoom: 19,
+      attribution: state.layer === 'carto'
+        ? '&copy; OpenStreetMap contributors &copy; CARTO'
+        : '&copy; <a href="https://www.vworld.kr">VWorld</a> / 국토교통부',
+    })).addTo(map);
+
+    if (state.hybrid && state.layer !== 'carto') {
+      hybridLayer = track(L.tileLayer(vworldUrl('Hybrid'), { maxZoom: 19 })).addTo(map);
+    }
+    render();
+  }
+
+  function render() {
+    $('nOk').textContent = counts.ok;
+    $('nBad').textContent = counts.bad;
+    $('curLayer').textContent = state.layer;
+    $('curScheme').textContent = state.scheme;
+    $('curZoom').textContent = map.getZoom();
+    $('failurl').textContent = counts.firstFail || '—';
+    $('verdict').innerHTML = verdict();
+  }
+
+  // The point of the demo: a blank map has four very different causes, and
+  // this is what tells them apart.
+  function verdict() {
+    if (!state.key && state.layer !== 'carto') {
+      return 'No API key yet. Paste one above — without it every VWorld tile 401s.';
+    }
+    if (counts.ok === 0 && counts.bad === 0) return 'Waiting for tiles…';
+
+    if (counts.ok > 0 && counts.bad === 0) {
+      return '<b class="ok">Working.</b> ' + counts.ok + ' tiles loaded over <b>' +
+        state.scheme + '</b>.' + (state.scheme === 'https'
+          ? ' HTTPS is confirmed — VWorld can be used on Vercel.'
+          : ' Now switch to <b>HTTPS</b>: that is the one that decides this.');
+    }
+    if (counts.ok > 0 && counts.bad > 0) {
+      return '<b>Partial.</b> ' + counts.ok + ' ok / ' + counts.bad +
+        ' failed. Normal if you panned outside Korea or past the zoom ceiling. ' +
+        'If it happens over a Korean campus at zoom 16, suspect rate limiting.';
+    }
+    if (state.scheme === 'https') {
+      return '<b class="bad">All HTTPS tiles failed.</b> Try <b>HTTP</b>. ' +
+        'If HTTP works and HTTPS does not, VWorld has no usable TLS and is ' +
+        'unusable on Vercel — we would fall back to Kakao Skyview. ' +
+        'If both fail, the key is wrong or locked to a different domain than this page.';
+    }
+    return '<b class="bad">All tiles failed on HTTP too.</b> The key is likely invalid, ' +
+      'not yet activated, or registered to a domain other than this page\'s origin (' +
+      location.origin + '). Open the failing URL above directly — VWorld returns a ' +
+      'readable error body.';
+  }
+
+  document.querySelectorAll('[data-layer]').forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll('[data-layer]').forEach(function (o) { o.classList.remove('on'); });
+      b.classList.add('on');
+      state.layer = b.dataset.layer;
+      rebuild();
+    };
+  });
+
+  document.querySelectorAll('[data-scheme]').forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll('[data-scheme]').forEach(function (o) { o.classList.remove('on'); });
+      b.classList.add('on');
+      state.scheme = b.dataset.scheme;
+      rebuild();
+    };
+  });
+
+  document.querySelectorAll('[data-at]').forEach(function (b) {
+    b.onclick = function () {
+      var p = b.dataset.at.split(',');
+      map.setView([+p[0], +p[1]], +p[2]);
+    };
+  });
+
+  $('hybrid').onclick = function () {
+    state.hybrid = !state.hybrid;
+    $('hybrid').classList.toggle('on', state.hybrid);
+    rebuild();
+  };
+
+  $('load').onclick = function () {
+    state.key = $('key').value.trim();
+    localStorage.setItem(KEY_STORE, state.key);
+    rebuild();
+  };
+
+  map.on('zoomend', render);
+  rebuild();
+})();
+</script>
+</body>
+</html>
