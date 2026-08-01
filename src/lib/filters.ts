@@ -19,12 +19,29 @@ export const EMPTY_FILTERS: UniversityFilters = {
 };
 
 /**
- * Tuition is stored as human-readable text whose first number is the lowest
- * tuition in million KRW per semester (see sample data). Extract it for the
- * "max tuition" filter; records without a leading number are never excluded.
+ * Tuition is rich text since the field gained an editor, so the markup has to
+ * come off before we look for a number. Attributes are full of digits that
+ * would otherwise win: `<h2>` reads as 2, `style="color:#dc2626"` as 2626, and
+ * an `&#8211;` en-dash entity as 8211.
+ *
+ * This is a parser, not a security boundary — sanitising for display is
+ * DOMPurify's job in `src/lib/sanitize.ts`. Values written before the editor
+ * existed carry no tags, so for them this is a no-op.
+ */
+function toPlainText(value: string): string {
+  return value
+    .replace(/<[^>]*>/g, ' ') // tags, and with them every attribute
+    .replace(/&[#\w]+;/g, ' '); // entities, including numeric ones
+}
+
+/**
+ * Tuition is human-readable text whose first number is the lowest tuition in
+ * million KRW per semester (see sample data). Extract it for the "max tuition"
+ * filter and the tuition sort in SideList; records without a number are never
+ * excluded, and sort last.
  */
 export function parseTuitionMillions(tuition: string): number | null {
-  const m = tuition.match(/(\d+(?:[.,]\d+)?)/);
+  const m = toPlainText(tuition).match(/(\d+(?:[.,]\d+)?)/);
   return m ? parseFloat(m[1].replace(',', '.')) : null;
 }
 

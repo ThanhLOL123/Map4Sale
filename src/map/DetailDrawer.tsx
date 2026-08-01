@@ -122,7 +122,7 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
       </Section>
 
       <Section title="💰 Học phí">
-        <p>{u.tuition || '—'}</p>
+        <RichText value={u.tuition} />
       </Section>
 
       <Section title="🏅 Học bổng">

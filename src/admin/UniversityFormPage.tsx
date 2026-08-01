@@ -381,9 +381,11 @@ export default function UniversityFormPage() {
         <label>Ngành đào tạo (mỗi dòng một ngành)
           <textarea rows={5} value={majorsText} onChange={(e) => setMajorsText(e.target.value)} />
         </label>
-        <label>Học phí (bắt đầu bằng số triệu KRW/kỳ để lọc được, ví dụ: “4.2 triệu KRW/kỳ …”)
-          <textarea rows={2} value={form.tuition} onChange={(e) => set('tuition', e.target.value)} />
-        </label>
+        <RichField
+          label="Học phí (số đầu tiên trong nội dung dùng để lọc và sắp xếp — hãy mở đầu bằng số triệu KRW/kỳ, ví dụ: “4.2 triệu KRW/kỳ …”)"
+          value={form.tuition}
+          onChange={(html) => set('tuition', html)}
+        />
         <RichField
           label="Học bổng"
           value={form.scholarship}
