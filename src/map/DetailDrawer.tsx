@@ -1,3 +1,4 @@
+import RichText from '../components/RichText';
 import type { University } from '../lib/types';
 
 interface Props {
@@ -88,7 +89,7 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
       {u.important_notes && (
         <div className="important-notes" role="note">
           <span className="important-notes-title">⚠️ Thông tin lưu ý quan trọng</span>
-          <p>{u.important_notes}</p>
+          <RichText value={u.important_notes} />
         </div>
       )}
 
@@ -125,7 +126,7 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
       </Section>
 
       <Section title="🏅 Học bổng">
-        <p>{u.scholarship || '—'}</p>
+        <RichText value={u.scholarship} />
       </Section>
 
       <Section title="📋 Điều kiện đầu vào">
@@ -137,16 +138,16 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
       </Section>
 
       <Section title="🏠 Ký túc xá">
-        <p>{u.dorm_info || '—'}</p>
+        <RichText value={u.dorm_info} />
       </Section>
 
       <Section title="🍜 Chi phí sinh hoạt">
-        <p>{u.living_cost || '—'}</p>
+        <RichText value={u.living_cost} />
       </Section>
 
       {u.sale_notes && (
         <Section title="📝 Ghi chú cho Sale">
-          <p className="sale-notes">{u.sale_notes}</p>
+          <RichText value={u.sale_notes} className="sale-notes" />
         </Section>
       )}
 

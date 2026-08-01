@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -10,6 +10,35 @@ import {
 } from '../lib/api';
 import type { UniversityInput, UniversityType } from '../lib/types';
 import '../map/leafletIcon';
+
+/** Lazy so TipTap stays out of the map bundle — sale accounts never load this. */
+const RichTextEditor = lazy(() => import('./RichTextEditor'));
+
+/**
+ * A rich-text field. Not wrapped in <label> like the plain inputs: the editor
+ * is a contenteditable div, which a label cannot be associated with, and
+ * clicking the caption would do nothing useful.
+ */
+function RichField({
+  label,
+  value,
+  onChange,
+  minRows,
+}: {
+  label: string;
+  value: string;
+  onChange: (html: string) => void;
+  minRows?: number;
+}) {
+  return (
+    <div className="rte-field">
+      <span className="rte-field-label">{label}</span>
+      <Suspense fallback={<div className="rte rte-loading">Đang tải trình soạn thảo…</div>}>
+        <RichTextEditor value={value} onChange={onChange} minRows={minRows} />
+      </Suspense>
+    </div>
+  );
+}
 
 const REGIONS = [
   'Seoul', 'Gyeonggi', 'Incheon', 'Busan', 'Daegu', 'Daejeon', 'Gwangju',
@@ -355,21 +384,33 @@ export default function UniversityFormPage() {
         <label>Học phí (bắt đầu bằng số triệu KRW/kỳ để lọc được, ví dụ: “4.2 triệu KRW/kỳ …”)
           <textarea rows={2} value={form.tuition} onChange={(e) => set('tuition', e.target.value)} />
         </label>
-        <label>Học bổng
-          <textarea rows={2} value={form.scholarship} onChange={(e) => set('scholarship', e.target.value)} />
-        </label>
-        <label>Ký túc xá
-          <textarea rows={2} value={form.dorm_info} onChange={(e) => set('dorm_info', e.target.value)} />
-        </label>
-        <label>Chi phí sinh hoạt
-          <textarea rows={2} value={form.living_cost} onChange={(e) => set('living_cost', e.target.value)} />
-        </label>
-        <label>Thông tin lưu ý quan trọng (hiển thị cho Sale)
-          <textarea rows={3} value={form.important_notes} onChange={(e) => set('important_notes', e.target.value)} />
-        </label>
-        <label>Ghi chú nội bộ cho Sale
-          <textarea rows={3} value={form.sale_notes} onChange={(e) => set('sale_notes', e.target.value)} />
-        </label>
+        <RichField
+          label="Học bổng"
+          value={form.scholarship}
+          onChange={(html) => set('scholarship', html)}
+        />
+        <RichField
+          label="Ký túc xá"
+          value={form.dorm_info}
+          onChange={(html) => set('dorm_info', html)}
+        />
+        <RichField
+          label="Chi phí sinh hoạt"
+          value={form.living_cost}
+          onChange={(html) => set('living_cost', html)}
+        />
+        <RichField
+          label="Thông tin lưu ý quan trọng (hiển thị cho Sale)"
+          value={form.important_notes}
+          onChange={(html) => set('important_notes', html)}
+          minRows={4}
+        />
+        <RichField
+          label="Ghi chú nội bộ cho Sale"
+          value={form.sale_notes}
+          onChange={(html) => set('sale_notes', html)}
+          minRows={4}
+        />
       </fieldset>
     </form>
   );
