@@ -62,6 +62,24 @@ supabase functions deploy log-login
 - **Redeploy** (Deployments → ⋯ → Redeploy). The app now runs live — the
   yellow **DEMO** badge disappears and login is required.
 
+### Checking what is actually deployed
+
+Every build writes `/version.json`, served uncached, so one fixed URL always
+reports the live commit:
+
+```bash
+curl -s https://map4-sale.vercel.app/version.json
+# {"commit":"540f247…","shortCommit":"540f247","ref":"main","env":"production","builtAt":"…"}
+```
+
+Compare it with `git log -1 --format=%H origin/main`; equal means the deploy
+landed. Do **not** use the hashed asset filenames under `/assets/` for this —
+they change on every build by design.
+
+Check it against the production domain (`map4-sale.vercel.app`), not the
+`…-git-<branch>-….vercel.app` alias: that alias points at a separate branch
+deployment and will report a different commit.
+
 ## 5. Create the first admin
 - Supabase → **Authentication → Users → Add user** (email + password; tick
   "Auto Confirm User" so they can log in immediately).
