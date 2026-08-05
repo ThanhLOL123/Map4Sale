@@ -24,17 +24,24 @@ function RichField({
   value,
   onChange,
   minRows,
+  withTable,
 }: {
   label: string;
   value: string;
   onChange: (html: string) => void;
   minRows?: number;
+  withTable?: boolean;
 }) {
   return (
     <div className="rte-field">
       <span className="rte-field-label">{label}</span>
       <Suspense fallback={<div className="rte rte-loading">Đang tải trình soạn thảo…</div>}>
-        <RichTextEditor value={value} onChange={onChange} minRows={minRows} />
+        <RichTextEditor
+          value={value}
+          onChange={onChange}
+          minRows={minRows}
+          withTable={withTable}
+        />
       </Suspense>
     </div>
   );
@@ -382,9 +389,10 @@ export default function UniversityFormPage() {
           <textarea rows={5} value={majorsText} onChange={(e) => setMajorsText(e.target.value)} />
         </label>
         <RichField
-          label="Học phí (số đầu tiên trong nội dung dùng để lọc và sắp xếp — hãy mở đầu bằng số triệu KRW/kỳ, ví dụ: “4.2 triệu KRW/kỳ …”)"
+          label="Học phí (số đầu tiên trong nội dung dùng để lọc và sắp xếp — hãy mở đầu bằng số triệu KRW/kỳ, ví dụ: “4.2 triệu KRW/kỳ …”. Nếu dùng bảng, đặt số tiền ở ô thường, không đặt ở ô tiêu đề.)"
           value={form.tuition}
           onChange={(html) => set('tuition', html)}
+          withTable
         />
         <RichField
           label="Học bổng"
@@ -408,7 +416,7 @@ export default function UniversityFormPage() {
           minRows={4}
         />
         <RichField
-          label="Ghi chú nội bộ cho Sale"
+          label="Ghi chú"
           value={form.sale_notes}
           onChange={(html) => set('sale_notes', html)}
           minRows={4}

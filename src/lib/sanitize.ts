@@ -21,12 +21,48 @@ const ALLOWED_TAGS = [
   'a',
   'h2', 'h3',
   'span', 'mark',
+  // Tables — only reachable from the Học phí editor, but the sanitiser is
+  // shared, so any field could legitimately hold one after a copy-paste.
+  'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'colgroup', 'col',
 ];
 
-const ALLOWED_ATTR = ['href', 'target', 'rel', 'style', 'data-color'];
+const ALLOWED_ATTR = [
+  'href', 'target', 'rel', 'style', 'data-color',
+  'colspan', 'rowspan', 'data-colwidth',
+];
 
-/** Only colour declarations survive on style; anything else is dropped. */
-const SAFE_STYLE = /^(color|background-color)\s*:\s*(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|[a-z]+)\s*;?\s*$/i;
+/**
+ * Style declarations we keep. `width` is here because TipTap writes column
+ * widths as `<col style="width: 120px">`; without it every table would collapse
+ * to even columns on render.
+ */
+const ALLOWED_STYLE_PROPS = new Set(['color', 'background-color', 'width']);
+
+/** Vectors that can smuggle a fetch or script out of a style value. */
+const UNSAFE_STYLE_VALUE = /url\s*\(|expression\s*\(|javascript:|@import/i;
+
+/**
+ * Filter a style attribute declaration by declaration.
+ *
+ * The previous version tested the whole attribute against one regex, so any
+ * style with two declarations was dropped entirely — which would silently kill
+ * a cell that carries both a colour and a width. Filtering per declaration
+ * keeps what is safe and drops only the rest.
+ */
+function filterStyle(style: string): string {
+  return style
+    .split(';')
+    .map((decl) => decl.trim())
+    .filter(Boolean)
+    .filter((decl) => {
+      const colon = decl.indexOf(':');
+      if (colon < 0) return false;
+      const prop = decl.slice(0, colon).trim().toLowerCase();
+      const value = decl.slice(colon + 1).trim();
+      return ALLOWED_STYLE_PROPS.has(prop) && !!value && !UNSAFE_STYLE_VALUE.test(value);
+    })
+    .join('; ');
+}
 
 let hooked = false;
 
@@ -41,9 +77,13 @@ function installHooks() {
       node.setAttribute('rel', 'noopener noreferrer');
     }
     // DOMPurify allows the style attribute wholesale once permitted, so narrow
-    // it here to the two colour declarations the toolbar can emit.
+    // it here to the declarations the toolbar can actually emit.
     const style = node.getAttribute?.('style');
-    if (style && !SAFE_STYLE.test(style.trim())) node.removeAttribute('style');
+    if (style) {
+      const safe = filterStyle(style);
+      if (safe) node.setAttribute('style', safe);
+      else node.removeAttribute('style');
+    }
   });
 }
 

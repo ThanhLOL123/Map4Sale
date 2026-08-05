@@ -146,7 +146,7 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
       </Section>
 
       {u.sale_notes && (
-        <Section title="📝 Ghi chú cho Sale">
+        <Section title="📝 Ghi chú">
           <RichText value={u.sale_notes} className="sale-notes" />
         </Section>
       )}

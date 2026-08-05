@@ -30,7 +30,12 @@ export const EMPTY_FILTERS: UniversityFilters = {
  */
 function toPlainText(value: string): string {
   return value
-    .replace(/<[^>]*>/g, ' ') // tags, and with them every attribute
+    // Header cells go first, contents and all. Now that Học phí can hold a
+    // table, headers are where labels like "Năm 2026" or "Học kỳ 1" live, and
+    // any of those would otherwise be read as the price. The figure itself
+    // belongs in a normal cell.
+    .replace(/<th\b[^>]*>[\s\S]*?<\/th>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ') // remaining tags, and with them every attribute
     .replace(/&[#\w]+;/g, ' '); // entities, including numeric ones
 }
 

@@ -3,12 +3,18 @@ import { EditorContent, useEditor, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Color, TextStyle } from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
+import { TableKit } from '@tiptap/extension-table';
 
 interface Props {
   value: string;
   onChange: (html: string) => void;
   /** Visible rows, roughly — matches the old textarea sizing. */
   minRows?: number;
+  /**
+   * Adds the table tools. Off by default so only Học phí — where tuition
+   * varies by faculty — carries the extra toolbar group.
+   */
+  withTable?: boolean;
 }
 
 /** Text colours offered in the toolbar. Kept short: a palette, not a picker. */
@@ -60,7 +66,12 @@ function ToolbarButton({
  * produce is inside the allow-list in `src/lib/sanitize.ts` — keep the two in
  * step if the toolbar grows.
  */
-export default function RichTextEditor({ value, onChange, minRows = 3 }: Props) {
+export default function RichTextEditor({
+  value,
+  onChange,
+  minRows = 3,
+  withTable = false,
+}: Props) {
   const editor = useEditor({
     // Required under React StrictMode (src/main.tsx): with the default,
     // TipTap builds the view during the first render pass, which StrictMode's
@@ -84,6 +95,8 @@ export default function RichTextEditor({ value, onChange, minRows = 3 }: Props) 
       TextStyle,
       Color,
       Highlight.configure({ multicolor: false }),
+      // TableKit bundles Table, TableRow, TableHeader and TableCell.
+      ...(withTable ? [TableKit.configure({ table: { resizable: true } })] : []),
     ],
     content: value || '',
     onUpdate: ({ editor: ed }) => {
@@ -175,6 +188,36 @@ export default function RichTextEditor({ value, onChange, minRows = 3 }: Props) 
             <option key={c.label} value={c.value}>{c.label}</option>
           ))}
         </select>
+
+        {withTable && (
+          <>
+            <span className="rte-sep" aria-hidden />
+            <ToolbarButton editor={editor} label="⊞ Bảng" title="Chèn bảng 3×3"
+              isActive={editor.isActive('table')}
+              onClick={() =>
+                editor.chain().focus()
+                  .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+                  .run()
+              } />
+            {/* Row and column tools only bite inside a table; disable them
+                elsewhere rather than letting a click do nothing silently. */}
+            <ToolbarButton editor={editor} label="+ Hàng" title="Thêm hàng bên dưới"
+              isActive={false}
+              onClick={() => editor.chain().focus().addRowAfter().run()} />
+            <ToolbarButton editor={editor} label="− Hàng" title="Xóa hàng"
+              isActive={false}
+              onClick={() => editor.chain().focus().deleteRow().run()} />
+            <ToolbarButton editor={editor} label="+ Cột" title="Thêm cột bên phải"
+              isActive={false}
+              onClick={() => editor.chain().focus().addColumnAfter().run()} />
+            <ToolbarButton editor={editor} label="− Cột" title="Xóa cột"
+              isActive={false}
+              onClick={() => editor.chain().focus().deleteColumn().run()} />
+            <ToolbarButton editor={editor} label="🗑 Bảng" title="Xóa toàn bộ bảng"
+              isActive={false}
+              onClick={() => editor.chain().focus().deleteTable().run()} />
+          </>
+        )}
       </div>
 
       <EditorContent
