@@ -5,6 +5,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import AppHeader from '../components/AppHeader';
 import { BASEMAPS, type Basemap } from './basemaps';
 import { EMPTY_FILTERS } from '../lib/filters';
+import { useFullscreen } from '../lib/useFullscreen';
 import { useUniversityBrowser } from '../lib/useUniversityBrowser';
 import type { University } from '../lib/types';
 import DetailDrawer from './DetailDrawer';
@@ -133,11 +134,37 @@ export default function MapView() {
   const [basemap, setBasemap] = useState<Basemap>('street');
   const tiles = BASEMAPS[basemap];
 
+  const [presentation, setPresentation] = useState(false);
+  const { active: isFullscreen, request: requestFullscreen, exit: exitFullscreen } = useFullscreen();
+
+  // Escape and F11 leave fullscreen without touching our button, so follow the
+  // browser back out of presentation mode rather than stranding the layout in
+  // it. Fullscreen entered by other means is ignored — only leaving matters.
+  useEffect(() => {
+    if (!isFullscreen) setPresentation(false);
+  }, [isFullscreen]);
+
+  const togglePresentation = () => {
+    const next = !presentation;
+    setPresentation(next);
+    // Styling applies regardless; fullscreen is best-effort on top of it.
+    if (next) void requestFullscreen();
+    else void exitFullscreen();
+  };
+
+  // Hiding the header and filter bar resizes the map container, and Leaflet
+  // caches its size. Re-measure once the CSS transition has settled.
+  useEffect(() => {
+    if (!map) return;
+    const t = setTimeout(() => map.invalidateSize(), 260);
+    return () => clearTimeout(t);
+  }, [presentation, map]);
+
   const noneAtAll = !loading && !error && universities.length === 0;
   const noneMatching = !loading && !error && universities.length > 0 && filtered.length === 0;
 
   return (
-    <div className={`map-page mobile-${mobileView}`}>
+    <div className={`map-page mobile-${mobileView}${presentation ? ' presentation' : ''}`}>
       <AppHeader />
 
       <FilterBar
@@ -210,6 +237,8 @@ export default function MapView() {
             home={HOME_VIEW}
             basemap={basemap}
             onBasemapChange={setBasemap}
+            presentation={presentation}
+            onPresentationToggle={togglePresentation}
           />
 
           {loading && (

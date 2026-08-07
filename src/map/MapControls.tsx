@@ -7,6 +7,8 @@ interface Props {
   home: { center: LatLngExpression; zoom: number };
   basemap: Basemap;
   onBasemapChange: (next: Basemap) => void;
+  presentation: boolean;
+  onPresentationToggle: () => void;
 }
 
 /**
@@ -15,7 +17,14 @@ interface Props {
  * so the buttons live outside Leaflet's DOM and their clicks/wheel events
  * never reach the map — no DomEvent.disableClickPropagation plumbing needed.
  */
-export default function MapControls({ map, home, basemap, onBasemapChange }: Props) {
+export default function MapControls({
+  map,
+  home,
+  basemap,
+  onBasemapChange,
+  presentation,
+  onPresentationToggle,
+}: Props) {
   if (!map) return null;
 
   const satellite = basemap === 'satellite';
@@ -76,6 +85,25 @@ export default function MapControls({ map, home, basemap, onBasemapChange }: Pro
           </svg>
         </button>
       )}
+
+      {/* Once presentation mode hides the header, this is the only way out —
+          so it stays in the control stack rather than living in the chrome. */}
+      <button
+        type="button"
+        className={`map-control map-control-present${presentation ? ' map-control-active' : ''}`}
+        aria-label={presentation ? 'Thoát chế độ trình chiếu' : 'Chế độ trình chiếu'}
+        title={presentation ? 'Thoát trình chiếu' : 'Chế độ trình chiếu'}
+        aria-pressed={presentation}
+        onClick={onPresentationToggle}
+      >
+        <svg viewBox="0 0 20 20" aria-hidden focusable="false">
+          {presentation ? (
+            <path d="M8 2.5v5.5H2.5M12 17.5V12h5.5" />
+          ) : (
+            <path d="M2.5 7.5v-5h5M17.5 12.5v5h-5M17.5 7.5v-5h-5M2.5 12.5v5h5" />
+          )}
+        </svg>
+      </button>
     </div>
   );
 }

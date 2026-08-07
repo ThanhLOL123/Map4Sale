@@ -731,6 +731,49 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 }
 .inline-label { font-size: 0.8rem; color: var(--muted); }
 
+/* ---------- presentation mode ---------- */
+/* Toggled from MapControls for pitching on a big monitor: the working chrome
+   comes off and everything a customer looks at scales up. All of it hangs off
+   one class on .map-page, so no component re-renders to change modes. */
+
+.map-page.presentation .app-header,
+.map-page.presentation .filter-bar { display: none; }
+
+.map-page.presentation {
+  /* The .map-wrap.has-detail rules are written in terms of this token, so the
+     map controls and status card follow the wider drawer for free. */
+  --drawer-w: min(760px, 45vw);
+}
+
+/* Drawer: the thing the customer actually reads. */
+.map-page.presentation .detail-drawer { font-size: 1.12rem; }
+.map-page.presentation .drawer-section { font-size: 1.05rem; padding: 0.9rem 0; }
+.map-page.presentation .drawer-section h3 { font-size: 1.15rem; }
+.map-page.presentation .drawer-header h2 { font-size: 1.6rem; }
+.map-page.presentation .drawer-subnames { font-size: 1rem; }
+.map-page.presentation .school-logo { width: 84px; height: 84px; }
+.map-page.presentation .badge { font-size: 0.9rem; }
+.map-page.presentation .chip { font-size: 0.95rem; }
+.map-page.presentation .important-notes { font-size: 1.05rem; padding: 0.9rem 1rem; }
+/* Tuition tables are read across a room, not at arm's length. */
+.map-page.presentation .rich-text table { font-size: 1em; }
+.map-page.presentation .rich-text th,
+.map-page.presentation .rich-text td { padding: 0.5rem 0.8rem; }
+.map-page.presentation .gallery img { height: 150px; }
+
+/* List: still there for jumping between schools, just bigger and calmer. */
+.map-page.presentation .side-list { width: 320px; }
+.map-page.presentation .uni-row { padding: 0.7rem; }
+.map-page.presentation .uni-row-name { font-size: 1.05rem; }
+.map-page.presentation .uni-row-sub,
+.map-page.presentation .uni-row-meta { display: none; }
+.map-page.presentation .uni-row-logo { width: 46px; height: 46px; }
+
+/* A phone is not the use case, and the control stack is already four deep. */
+@media (max-width: 768px) {
+  .map-control-present { display: none; }
+}
+
 /* ---------- rich text ---------- */
 /* Two halves of one feature: `.rte*` is the admin editor (TipTap), `.rich-text`
    is the sanitized output rendered in the drawer. The tag list here and the
