@@ -99,5 +99,15 @@ export function sanitizeRichText(html: string): string {
     ALLOWED_ATTR,
     // javascript:, data: and friends never reach an href.
     ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|tel:|#|\/)/i,
+    /**
+     * Without this, merged table cells lose their spans.
+     *
+     * DOMPurify tests every attribute that is not on its URI-safe list against
+     * ALLOWED_URI_REGEXP. Its default regexp has an escape hatch for values that
+     * do not look like URIs at all; the tighter one above does not, so
+     * `rowspan="3"` is judged an invalid URI and dropped. `style` survives only
+     * because it is on DOMPurify's built-in URI-safe list — these are not.
+     */
+    ADD_URI_SAFE_ATTR: ['colspan', 'rowspan', 'data-colwidth'],
   });
 }

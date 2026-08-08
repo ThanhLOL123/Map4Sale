@@ -69,6 +69,7 @@ function emptyForm(): UniversityInput {
     type: 'private',
     ranking: null,
     majors: [],
+    majors_detail: '',
     tuition: '',
     scholarship: '',
     topik_req: '',
@@ -385,9 +386,16 @@ export default function UniversityFormPage() {
             <input value={form.gpa_req} onChange={(e) => set('gpa_req', e.target.value)} />
           </label>
         </div>
-        <label>Ngành đào tạo (mỗi dòng một ngành)
+        <label>Ngành đào tạo — danh sách lọc (mỗi dòng một ngành)
           <textarea rows={5} value={majorsText} onChange={(e) => setMajorsText(e.target.value)} />
         </label>
+        <RichField
+          label="Giới thiệu khoa – chuyên ngành (bảng trình bày; danh sách lọc ở trên vẫn giữ nguyên)"
+          value={form.majors_detail}
+          onChange={(html) => set('majors_detail', html)}
+          minRows={6}
+          withTable
+        />
         <RichField
           label="Học phí (số đầu tiên trong nội dung dùng để lọc và sắp xếp — hãy mở đầu bằng số triệu KRW/kỳ, ví dụ: “4.2 triệu KRW/kỳ …”. Nếu dùng bảng, đặt số tiền ở ô thường, không đặt ở ô tiêu đề.)"
           value={form.tuition}

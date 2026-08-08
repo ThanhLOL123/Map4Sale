@@ -121,6 +121,16 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
         </div>
       </Section>
 
+      {u.majors_detail && (
+        <Section title="🏛️ Giới thiệu khoa – chuyên ngành">
+          <RichText
+            value={u.majors_detail}
+            expandable
+            title="Giới thiệu khoa – chuyên ngành"
+          />
+        </Section>
+      )}
+
       <Section title="💰 Học phí">
         <RichText value={u.tuition} />
       </Section>

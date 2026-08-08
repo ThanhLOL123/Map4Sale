@@ -731,6 +731,87 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 }
 .inline-label { font-size: 0.8rem; color: var(--muted); }
 
+/* ---------- expandable content + overlay ---------- */
+/* Tall content (the faculty/major table above all) is clamped, with a button
+   that opens it in a sub-screen. RichText only renders the button once it has
+   measured real overflow, so short content is untouched. */
+
+.rich-text-clamp { max-height: 320px; overflow: hidden; position: relative; }
+/* Fade the cut edge so it reads as "there is more", not as a rendering bug. */
+.rich-text-clamp::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 42px;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+  pointer-events: none;
+}
+.rich-text-expand {
+  margin-top: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--brand);
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.rich-text-expand:hover { background: #f1f5f9; }
+
+.expand-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300; /* above the drawer (1000), below the mobile filter sheet */
+  background: rgb(15 23 42 / 0.55);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.expand-panel {
+  width: 80vw;
+  height: 80vh;
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* Close sits at the top LEFT, as requested, so the title follows it. */
+.expand-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+.expand-close {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+.expand-close:hover { background: #f1f5f9; }
+.expand-title { font-weight: 600; }
+.expand-body { flex: 1; min-height: 0; overflow: auto; padding: 1rem 1.1rem; }
+/* Inside the sub-screen there is room to breathe. */
+.expand-body .rich-text-full { font-size: 1.05rem; }
+.expand-body .rich-text-full th,
+.expand-body .rich-text-full td { padding: 0.45rem 0.7rem; }
+/* There is room in the sub-screen, so let the table use the full width the
+   way the printed brochure does. */
+.expand-body .rich-text-full table { width: 100%; }
+
+@media (max-width: 768px) {
+  .expand-panel { width: 94vw; height: 88vh; }
+}
+
 /* ---------- presentation mode ---------- */
 /* Toggled from MapControls for pitching on a big monitor: the working chrome
    comes off and everything a customer looks at scales up. All of it hangs off
@@ -853,8 +934,18 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   vertical-align: top;
   min-width: 3rem;
 }
+/* Brochure styling: header row and header column in the brand blue, matching
+   the client's "GIỚI THIỆU KHOA – CHUYÊN NGÀNH" layout. Header cells created
+   by toggleHeaderColumn get the same treatment, which is what makes a merged
+   faculty label read as a group heading. */
 .rich-text th,
-.rte-content th { background: #f1f5f9; font-weight: 600; text-align: left; }
+.rte-content th {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+  border-color: #ffffff59;
+}
 /* Cells hold block content, so kill the paragraph margins inside them. */
 .rich-text td > p, .rich-text th > p,
 .rte-content td > p, .rte-content th > p { margin: 0; }

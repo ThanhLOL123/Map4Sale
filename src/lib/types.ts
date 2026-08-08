@@ -15,6 +15,8 @@ export interface University {
   type: UniversityType;
   ranking: number | null;
   majors: string[];
+  /** Rich-text faculty/major table for the profile; `majors` drives filtering. */
+  majors_detail: string;
   tuition: string;
   scholarship: string;
   topik_req: string;

@@ -37,7 +37,8 @@
     "living_cost": "Khoảng 800.000–1.200.000 KRW/tháng (khu Gwanak rẻ hơn trung tâm).",
     "important_notes": "Hồ sơ đóng rất sớm (~6 tháng trước kỳ học) và một số khoa yêu cầu phỏng vấn. Cạnh tranh cực cao — chỉ tư vấn cho HS học lực xuất sắc.",
     "sale_notes": "Trường top 1 Hàn Quốc — chỉ tư vấn cho HS có học lực xuất sắc. Hồ sơ nộp sớm 6 tháng.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": "<table><tbody><tr><th><p>Khoa</p></th><th colspan=\"2\"><p>Chuyên ngành</p></th></tr><tr><th rowspan=\"4\"><p>Nhân văn và Quốc tế học</p></th><td><p>Ngữ văn Hàn Quốc</p></td><td><p>Giáo dục tiếng Hàn</p></td></tr><tr><td><p>Ngữ văn Anh</p></td><td><p>Ngôn ngữ và Văn hóa Đức</p></td></tr><tr><td><p>Ngôn ngữ và Văn hóa Trung Quốc</p></td><td><p>Khoa Lịch sử</p></td></tr><tr><td><p>Khoa Triết học</p></td><td><p>Khoa Sáng tác Văn học</p></td></tr><tr><th rowspan=\"3\"><p>Quản trị Kinh doanh</p></th><td><p>Quản trị Kinh doanh</p></td><td><p>Quản trị Du lịch</p></td></tr><tr><td><p>Hệ thống Thông tin Quản lý</p></td><td><p>Phân tích Dữ liệu Kinh doanh (Big Data)</p></td></tr><tr><td><p>Kế toán và Thuế</p></td><td><p>Thương mại Quốc tế</p></td></tr><tr><th rowspan=\"4\"><p>Khoa học Xã hội</p></th><td><p>Kinh tế - Tài chính</p></td><td><p>Hành chính công</p></td></tr><tr><td><p>Chính trị Ngoại giao</p></td><td><p>Ngôn luận Truyền hình</p></td></tr><tr><td><p>Xã hội học</p></td><td><p>Tâm lý học</p></td></tr><tr><td><p>Phúc lợi Xã hội</p></td><td><p>Thông tin - Thư viện học</p></td></tr><tr><th rowspan=\"5\"><p>Kỹ thuật - Công nghệ</p></th><td><p>Kỹ thuật Xây dựng Dân dụng</p></td><td><p>Kiến trúc (5 năm)</p></td></tr><tr><td><p>Kỹ thuật Điện tử</p></td><td><p>Kỹ thuật Máy tính</p></td></tr><tr><td><p>Phần mềm Game</p></td><td><p>Kỹ thuật Giao thông</p></td></tr><tr><td><p>Quy hoạch Đô thị</p></td><td><p>Cơ khí</p></td></tr><tr><td><p>Kỹ thuật Ô tô</p></td><td><p>Kỹ thuật Robot</p></td></tr><tr><th rowspan=\"3\"><p>Mỹ thuật</p></th><td><p>Hội họa</p></td><td><p>Thiết kế Công nghiệp</p></td></tr><tr><td><p>Thiết kế Thời trang</p></td><td><p>Marketing Thời trang</p></td></tr><tr><td><p>Hoạt hình và Phim ảnh</p></td><td><p>Webtoon</p></td></tr></tbody></table>"
   },
   {
     "id": "d1000000-0000-4000-8000-000000000002",
@@ -73,7 +74,8 @@
     "living_cost": "Khoảng 600.000–900.000 KRW/tháng — Daejeon rẻ hơn Seoul đáng kể.",
     "important_notes": "Kỳ xuân hạn nộp từ tháng 9 năm trước; có phỏng vấn học thuật bằng tiếng Anh. Vẫn cần chứng minh tài chính dù được học bổng.",
     "sale_notes": "Phù hợp HS giỏi khối tự nhiên muốn học bằng tiếng Anh, chi phí thấp nhờ học bổng. Deadline sớm (tháng 9 cho kỳ xuân).",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000003",
@@ -112,7 +114,8 @@
     "living_cost": "Khoảng 1.000.000–1.400.000 KRW/tháng (khu Sinchon sôi động, chi phí cao).",
     "important_notes": "Có 2 đợt nộp (Early/Regular) — nộp Early để tăng cơ hội học bổng. Khoa tiếng KLI xét tuyển riêng, khác đại học chính quy.",
     "sale_notes": "Thuộc nhóm SKY, thương hiệu mạnh với phụ huynh. Khoa tiếng (KLI) là đường vào phổ biến cho HS Việt.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000004",
@@ -150,7 +153,8 @@
     "living_cost": "Khoảng 1.000.000–1.300.000 KRW/tháng.",
     "important_notes": "Nộp hồ sơ 100% online, không nhận bản giấy. Business School đòi điểm TOPIK/tiếng Anh cao hơn mặt bằng chung.",
     "sale_notes": "Nhóm SKY. Business School rất mạnh — hướng cho HS muốn ngành kinh doanh. Nộp hồ sơ online 100%.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000005",
@@ -186,7 +190,8 @@
     "living_cost": "Khoảng 500.000–800.000 KRW/tháng — Pohang chi phí thấp.",
     "important_notes": "Chỉ tuyển quy mô nhỏ, xét hồ sơ nghiên cứu kỹ và phỏng vấn bắt buộc. Xa Seoul — lưu ý HS về môi trường sinh hoạt.",
     "sale_notes": "Quy mô nhỏ, tỉ lệ GS/SV cao, hướng nghiên cứu. Chỉ phù hợp HS rất giỏi tự nhiên; ít sôi động vì xa Seoul.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000006",
@@ -222,7 +227,8 @@
     "living_cost": "Khoảng 900.000–1.200.000 KRW/tháng.",
     "important_notes": "Ngành bán dẫn liên kết Samsung có quy trình xét riêng và ràng buộc cam kết. Hai campus khác nhau — xác nhận đúng địa điểm học.",
     "sale_notes": "Gắn với tập đoàn Samsung — điểm bán hàng mạnh về cơ hội việc làm. Hai campus: nhắc HS ngành kỹ thuật học ở Suwon.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000007",
@@ -259,7 +265,8 @@
     "living_cost": "Khoảng 950.000–1.250.000 KRW/tháng.",
     "important_notes": "Học bổng HISP theo TOPIK chỉ áp dụng kỳ đầu, phải giữ GPA để duy trì. Ngành kỹ thuật cạnh tranh cao.",
     "sale_notes": "Nổi tiếng nhất về kỹ thuật trong nhóm tư thục. Ga Hanyang Univ ngay cổng trường — tiện đi làm thêm.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000008",
@@ -295,7 +302,8 @@
     "living_cost": "Khoảng 900.000–1.200.000 KRW/tháng.",
     "important_notes": "Ngành Quản trị khách sạn – du lịch rất hot, hết chỉ tiêu sớm. Có 2 campus (Seoul & Global/Yongin) — xác nhận nơi học.",
     "sale_notes": "Số 1 về Quản trị khách sạn – du lịch, ngành rất hợp thị hiếu HS Việt. Campus đẹp nổi tiếng — dùng ảnh campus khi tư vấn.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000009",
@@ -331,7 +339,8 @@
     "living_cost": "Khoảng 950.000–1.250.000 KRW/tháng (khu Edae nhiều việc làm thêm).",
     "important_notes": "CHỈ tuyển nữ — xác nhận với HS trước khi tư vấn. Một số ngành yêu cầu phỏng vấn hoặc portfolio.",
     "sale_notes": "Chỉ tuyển nữ. Thương hiệu tốt với phụ huynh; khu Edae an toàn, nhiều việc làm thêm cho SV.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000010",
@@ -367,7 +376,8 @@
     "living_cost": "Khoảng 950.000–1.250.000 KRW/tháng (gần Sinchon/Hongdae).",
     "important_notes": "Quy mô nhỏ, chỉ tiêu quốc tế hạn chế và hết sớm. Khoa tiếng KLEC tách biệt với chương trình chính quy.",
     "sale_notes": "Khoa tiếng Sogang KLEC nổi tiếng dạy hội thoại tốt nhất — phù hợp HS muốn giỏi giao tiếp nhanh.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000011",
@@ -403,7 +413,8 @@
     "living_cost": "Khoảng 900.000–1.200.000 KRW/tháng.",
     "important_notes": "Ngành nghệ thuật – điện ảnh yêu cầu portfolio/thi năng khiếu; hạn nộp và quy trình khác ngành thường.",
     "sale_notes": "Số 1 về nghệ thuật – điện ảnh (nhiều diễn viên nổi tiếng). Hút HS mê K-drama/K-pop; ngành nghệ thuật cần portfolio.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000012",
@@ -439,7 +450,8 @@
     "living_cost": "Khoảng 900.000–1.150.000 KRW/tháng (khu Kondae sầm uất, nhiều việc làm thêm).",
     "important_notes": "Rất đông DHS Việt nên khoa tiếng hết chỉ tiêu nhanh — nộp sớm. Kiểm tra kỹ hồ sơ chứng minh tài chính.",
     "sale_notes": "Rất phổ biến với DHS Việt — cộng đồng đông, thủ tục thân thiện. Khu Kondae nhiều quán Việt, dễ tìm việc làm thêm.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000013",
@@ -475,7 +487,8 @@
     "living_cost": "Khoảng 950.000–1.250.000 KRW/tháng (trung tâm Jung-gu).",
     "important_notes": "Ngành điện ảnh cần portfolio. Vị trí trung tâm nên chi phí thuê ngoài cao — lưu ý ngân sách của HS.",
     "sale_notes": "Vị trí trung tâm cạnh Namsan Tower — điểm cộng khi tư vấn. Mạnh về điện ảnh (nhiều idol theo học).",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000014",
@@ -510,7 +523,8 @@
     "living_cost": "Khoảng 1.000.000–1.300.000 KRW/tháng (Hongdae là khu chơi đêm đắt đỏ).",
     "important_notes": "Ngành mỹ thuật – thiết kế BẮT BUỘC portfolio và có thể thi năng khiếu. KTX rất hạn chế, chuẩn bị phương án thuê ngoài.",
     "sale_notes": "Số 1 về mỹ thuật – thiết kế. Khu Hongdae cực hút giới trẻ — điểm bán hàng với HS mê nghệ thuật.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000015",
@@ -545,7 +559,8 @@
     "living_cost": "Khoảng 850.000–1.100.000 KRW/tháng.",
     "important_notes": "Ngành khách sạn & game hot, hết chỉ tiêu sớm. Xác nhận yêu cầu TOPIK theo từng ngành cụ thể.",
     "sale_notes": "Mạnh về khách sạn – du lịch và game/hoạt hình, học phí mềm hơn nhóm trên. Gần Konkuk, cộng đồng Việt đông.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000016",
@@ -581,7 +596,8 @@
     "living_cost": "Khoảng 850.000–1.100.000 KRW/tháng.",
     "important_notes": "Đầu vào vừa phải nhưng cần nộp TOPIK đúng hạn. Học bổng theo TOPIK chỉ áp dụng kỳ đầu.",
     "sale_notes": "Trường CNTT lâu đời, học phí hợp lý, đầu vào vừa phải — lựa chọn an toàn cho HS khá.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000017",
@@ -616,7 +632,8 @@
     "living_cost": "Khoảng 750.000–1.000.000 KRW/tháng — Incheon rẻ hơn Seoul.",
     "important_notes": "Thế mạnh là logistics/hàng không (liên kết Korean Air). Ở Incheon — xa trung tâm Seoul, lưu ý HS về đi lại.",
     "sale_notes": "Gắn với Korean Air (tập đoàn Hanjin) — mạnh logistics & hàng không. Gần sân bay, chi phí dễ chịu.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000018",
@@ -651,7 +668,8 @@
     "living_cost": "Khoảng 750.000–1.000.000 KRW/tháng — Suwon rẻ hơn Seoul, gần Samsung Digital City.",
     "important_notes": "Gần Samsung Suwon, mạnh kỹ thuật. Ở Suwon (không phải Seoul) — xác nhận rõ vị trí với HS.",
     "sale_notes": "Gần đại bản doanh Samsung Suwon — cơ hội thực tập/việc làm kỹ thuật. Phù hợp HS khá muốn chi phí vừa phải.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000019",
@@ -687,7 +705,8 @@
     "living_cost": "Khoảng 750.000–950.000 KRW/tháng.",
     "important_notes": "Đầu vào dễ, nhận TOPIK 2 cho khoa tiếng — hợp HS chưa vững tiếng. Xét visa chặt, chuẩn bị kỹ hồ sơ tài chính.",
     "sale_notes": "Đầu vào dễ, khoa tiếng lớn, sát Seoul (30 phút tàu) — lựa chọn phổ biến cho HS trung bình khá.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000020",
@@ -722,7 +741,8 @@
     "living_cost": "Khoảng 650.000–900.000 KRW/tháng — Busan rẻ hơn Seoul ~30%.",
     "important_notes": "Trường công: hạn nộp và chỉ tiêu GKS riêng. Ở Busan — xa Seoul, cơ hội việc làm thêm ít hơn.",
     "sale_notes": "Trường công top đầu ngoài Seoul: học phí rẻ bằng nửa trường tư. Busan là thành phố biển lớn thứ 2 — hợp HS ngân sách hạn chế.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000021",
@@ -757,7 +777,8 @@
     "living_cost": "Khoảng 600.000–850.000 KRW/tháng — Daegu chi phí thấp.",
     "important_notes": "Trường công chi phí thấp nhưng Daegu ít việc làm thêm — tư vấn rõ về tài chính. Nhiều suất học bổng GKS khu vực.",
     "sale_notes": "Trường công lớn, học phí + sinh hoạt rẻ nhất nhóm — phương án tiết kiệm tốt. Daegu ít việc làm thêm hơn Seoul, cần nói rõ với HS.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   },
   {
     "id": "d1000000-0000-4000-8000-000000000022",
@@ -793,6 +814,7 @@
     "living_cost": "Khoảng 550.000–800.000 KRW/tháng — Gwangju chi phí rất thấp.",
     "important_notes": "Thuộc nhóm trường ưu tiên visa thẳng — hồ sơ dễ đậu nhưng phải chuẩn bị tài chính đúng chuẩn. Gwangju xa Seoul.",
     "sale_notes": "Chi phí tổng thấp nhất danh sách. Visa thẳng (trường ưu tiên) — hồ sơ dễ đậu. Phù hợp HS cần tiết kiệm tối đa.",
-    "updated_at": "2026-07-01T00:00:00Z"
+    "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
   }
 ]

@@ -62,6 +62,19 @@ supabase functions deploy log-login
 - **Redeploy** (Deployments → ⋯ → Redeploy). The app now runs live — the
   yellow **DEMO** badge disappears and login is required.
 
+### Upgrading an existing deployment
+
+Schema changes land as numbered files in `supabase/migrations/`. Run any you
+have not applied yet in the Supabase SQL editor — each is idempotent, so
+re-running one is harmless:
+
+- `0004_add_majors_detail.sql` — adds the "Giới thiệu khoa – chuyên ngành"
+  rich-text column. Without it the profile section stays empty and saving a
+  university fails on the unknown column.
+
+`supabase/production_setup.sql` already contains every column for a fresh
+install; the migrations are only for databases created before a change.
+
 ### Checking what is actually deployed
 
 Every build writes `/version.json`, served uncached, so one fixed URL always

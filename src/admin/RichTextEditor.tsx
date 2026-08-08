@@ -216,6 +216,20 @@ export default function RichTextEditor({
             <ToolbarButton editor={editor} label="🗑 Bảng" title="Xóa toàn bộ bảng"
               isActive={false}
               onClick={() => editor.chain().focus().deleteTable().run()} />
+            {/* The brochure layout depends on these: each faculty label is one
+                merged cell spanning its majors, in a header column. */}
+            <ToolbarButton editor={editor} label="⇄ Gộp" title="Gộp các ô đang chọn"
+              isActive={false}
+              onClick={() => editor.chain().focus().mergeCells().run()} />
+            <ToolbarButton editor={editor} label="⇹ Tách" title="Tách ô đã gộp"
+              isActive={false}
+              onClick={() => editor.chain().focus().splitCell().run()} />
+            <ToolbarButton editor={editor} label="⬒ Hàng TĐ" title="Bật/tắt hàng tiêu đề"
+              isActive={false}
+              onClick={() => editor.chain().focus().toggleHeaderRow().run()} />
+            <ToolbarButton editor={editor} label="◨ Cột TĐ" title="Bật/tắt cột tiêu đề"
+              isActive={false}
+              onClick={() => editor.chain().focus().toggleHeaderColumn().run()} />
           </>
         )}
       </div>

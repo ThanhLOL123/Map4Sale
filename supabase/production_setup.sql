@@ -30,6 +30,7 @@ create table if not exists public.universities (
   type            text not null default 'private' check (type in ('public', 'private')),
   ranking         int,
   majors          jsonb not null default '[]'::jsonb,
+  majors_detail   text not null default '',
   tuition         text not null default '',
   scholarship     text not null default '',
   topik_req       text not null default '',
@@ -46,6 +47,7 @@ create table if not exists public.universities (
 -- newer columns are present.
 alter table public.universities add column if not exists video_urls      jsonb not null default '[]'::jsonb;
 alter table public.universities add column if not exists important_notes text  not null default '';
+alter table public.universities add column if not exists majors_detail   text  not null default '';
 
 create table if not exists public.profiles (
   id         uuid primary key references auth.users (id) on delete cascade,
