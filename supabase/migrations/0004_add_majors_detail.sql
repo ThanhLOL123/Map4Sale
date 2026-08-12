@@ -8,3 +8,5 @@
 
 alter table public.universities
   add column if not exists majors_detail text not null default '';
+
+-- Idempotent: safe to re-run against a database that already has this column.
