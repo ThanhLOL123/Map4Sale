@@ -80,6 +80,11 @@ export default function SideList({ universities, selected, onSelect, sort, onSor
                     {u.type === 'public' ? 'Công lập' : 'Tư thục'}
                   </span>
                   {u.ranking != null && <span className="badge badge-rank">#{u.ranking}</span>}
+                  {u.is_featured && (
+                    <span className="badge badge-featured" title="Nổi bật">
+                      ★
+                    </span>
+                  )}
                 </span>
               </button>
             </li>

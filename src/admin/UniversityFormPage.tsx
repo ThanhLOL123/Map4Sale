@@ -68,6 +68,7 @@ function emptyForm(): UniversityInput {
     region: 'Seoul',
     type: 'private',
     ranking: null,
+    is_featured: false,
     majors: [],
     majors_detail: '',
     tuition: '',
@@ -375,6 +376,14 @@ export default function UniversityFormPage() {
               type="number" min="1" value={form.ranking ?? ''}
               onChange={(e) => set('ranking', e.target.value ? Number(e.target.value) : null)}
             />
+          </label>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={form.is_featured}
+              onChange={(e) => set('is_featured', e.target.checked)}
+            />
+            ★ Nổi bật
           </label>
           <label>Yêu cầu TOPIK
             <input value={form.topik_req} onChange={(e) => set('topik_req', e.target.value)} />

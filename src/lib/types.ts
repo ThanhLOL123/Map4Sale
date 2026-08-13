@@ -14,6 +14,7 @@ export interface University {
   region: string;
   type: UniversityType;
   ranking: number | null;
+  is_featured: boolean;
   majors: string[];
   /** Rich-text faculty/major table for the profile; `majors` drives filtering. */
   majors_detail: string;
