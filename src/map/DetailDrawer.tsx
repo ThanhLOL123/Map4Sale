@@ -82,6 +82,7 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
               {u.type === 'public' ? 'Công lập' : 'Tư thục'}
             </span>
             {u.ranking != null && <span className="badge badge-rank">Hạng #{u.ranking}</span>}
+            {u.is_featured && <span className="badge badge-featured">★ Nổi bật</span>}
           </p>
         </div>
       </header>

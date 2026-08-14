@@ -7,6 +7,7 @@ export interface UniversityFilters {
   type: string; // '' | 'public' | 'private'
   maxTuition: number | null; // million KRW per semester
   maxRanking: number | null;
+  featuredOnly: boolean;
 }
 
 export const EMPTY_FILTERS: UniversityFilters = {
@@ -16,6 +17,7 @@ export const EMPTY_FILTERS: UniversityFilters = {
   type: '',
   maxTuition: null,
   maxRanking: null,
+  featuredOnly: false,
 };
 
 /**
@@ -70,6 +72,7 @@ export function filterUniversities(
     if (f.maxRanking != null && (u.ranking == null || u.ranking > f.maxRanking)) {
       return false;
     }
+    if (f.featuredOnly && !u.is_featured) return false;
     return true;
   });
 }

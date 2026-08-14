@@ -8,17 +8,22 @@ function sortUniversities(list: University[], key: SortKey): University[] {
   const copy = [...list];
   switch (key) {
     case 'name':
-      return copy.sort((a, b) => a.name_vi.localeCompare(b.name_vi, 'vi'));
+      copy.sort((a, b) => a.name_vi.localeCompare(b.name_vi, 'vi'));
+      break;
     case 'tuition':
-      return copy.sort((a, b) => {
+      copy.sort((a, b) => {
         const ta = parseTuitionMillions(a.tuition);
         const tb = parseTuitionMillions(b.tuition);
         return (ta ?? Infinity) - (tb ?? Infinity); // unparseable tuition sorts last
       });
+      break;
     case 'ranking':
     default:
-      return copy.sort((a, b) => (a.ranking ?? Infinity) - (b.ranking ?? Infinity));
+      copy.sort((a, b) => (a.ranking ?? Infinity) - (b.ranking ?? Infinity));
   }
+  // "Nổi bật" schools lead whichever sort is active; the chosen order still
+  // holds inside each group (Array.prototype.sort is stable).
+  return [...copy.filter((u) => u.is_featured), ...copy.filter((u) => !u.is_featured)];
 }
 
 interface Props {

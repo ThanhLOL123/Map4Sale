@@ -18,6 +18,7 @@ function activeFilterCount(f: UniversityFilters): number {
   if (f.type) n++;
   if (f.maxTuition != null) n++;
   if (f.maxRanking != null) n++;
+  if (f.featuredOnly) n++;
   return n;
 }
 
@@ -100,6 +101,14 @@ export default function FilterBar({ universities, filters, onChange, matchCount 
           <option value="20">Top 20</option>
           <option value="50">Top 50</option>
         </select>
+        <label className="filter-check">
+          <input
+            type="checkbox"
+            checked={filters.featuredOnly}
+            onChange={(e) => set({ featuredOnly: e.target.checked })}
+          />
+          ★ Chỉ trường nổi bật
+        </label>
         {hasActiveFilter && (
           <button type="button" className="btn btn-ghost" onClick={() => onChange(EMPTY_FILTERS)}>
             Xóa lọc

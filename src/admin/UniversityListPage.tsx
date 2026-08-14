@@ -57,6 +57,9 @@ export default function UniversityListPage() {
             <tr key={u.id}>
               <td>
                 <strong>{u.name_vi}</strong>
+                {u.is_featured && (
+                  <span className="badge badge-featured" title="Nổi bật">★</span>
+                )}
                 <br />
                 <span className="muted">{u.name_en}</span>
               </td>
