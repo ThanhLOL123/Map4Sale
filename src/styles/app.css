@@ -223,12 +223,26 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 .uni-row-name { font-weight: 600; }
 .uni-row-sub { color: var(--muted); font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .uni-row-meta {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
   width: 100%;
   justify-content: flex-start;
   padding-left: calc(40px + 0.8rem);
+}
+/* The padding above keeps the badges under the name, leaving the logo's column
+   empty; the star sits in that gutter instead of trailing the badges. */
+.uni-row-meta .badge-featured {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  /* Logo-width so the star centres under the logo rather than hugging its left edge. */
+  width: 40px;
+  padding-inline: 0;
+  text-align: center;
 }
 .uni-list-empty { padding: 2rem 1rem; text-align: center; }
 
