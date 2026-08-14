@@ -275,6 +275,8 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 /* Sits among the filter selects, so it needs their height and framing. */
 .filter-check {
   display: flex;
+  /* The global `label` rule stacks its children; this one reads as a row. */
+  flex-direction: row;
   align-items: center;
   gap: 0.4rem;
   white-space: nowrap;
@@ -1106,6 +1108,8 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
     overflow-y: auto;
   }
   .filter-panel.open select { width: 100%; }
+  /* The panel centres its items; full width keeps this aligned with the selects. */
+  .filter-panel.open .filter-check { width: 100%; }
   .filter-apply { display: block; width: 100%; }
 
   /* Detail panel becomes a bottom sheet over the map. */
