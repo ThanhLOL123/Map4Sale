@@ -1,0 +1,31 @@
+name: Purge old activity data
+
+# Enforces the 30-day retention promised on the "Hoạt động nhân viên" screen.
+# Requires ONE GitHub secret:
+#   SUPABASE_DB_URL  — Supabase → Project Settings → Database → Connection
+#     string → URI (the postgresql://… value).
+#
+# Password sign-ins (login_logs.kind = 'login') are deliberately NOT purged:
+# that table is the security audit trail behind the "Bất thường" flagging.
+
+on:
+  workflow_dispatch: {} # run manually from the Actions tab
+  schedule:
+    - cron: '20 18 * * *' # 18:20 UTC = 01:20 giờ Việt Nam, daily
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete rows older than 30 days
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DB_URL" ]; then
+            echo "::error::Missing secret SUPABASE_DB_URL. Add it in Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          psql "$DB_URL" -v ON_ERROR_STOP=1 \
+            -c "delete from public.activity_events where occurred_at < now() - interval '30 days';" \
+            -c "delete from public.login_logs where kind = 'resume' and login_at < now() - interval '30 days';"
+          echo "Purge complete."

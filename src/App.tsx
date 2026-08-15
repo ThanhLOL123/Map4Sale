@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import AccountsPage from './admin/AccountsPage';
+import ActivityPage from './admin/ActivityPage';
 import AdminLayout from './admin/AdminLayout';
 import LoginLogsPage from './admin/LoginLogsPage';
 import UniversityFormPage from './admin/UniversityFormPage';
@@ -28,6 +29,7 @@ export default function App() {
               <Route path="universities/:id/edit" element={<UniversityFormPage />} />
               <Route path="accounts" element={<AccountsPage />} />
               <Route path="logs" element={<LoginLogsPage />} />
+              <Route path="activity" element={<ActivityPage />} />
             </Route>
           </Route>
 

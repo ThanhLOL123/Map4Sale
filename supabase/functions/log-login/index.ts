@@ -1,7 +1,10 @@
-// Edge Function: record a successful login (spec §4.5).
+// Edge Function: record an access (spec §4.5).
 // Reads the caller's real IP, resolves it to a city/country via ip-api.com,
 // derives the browser/device from the user-agent, and inserts one row into
 // login_logs with the service-role key (bypasses RLS).
+//
+// `kind` in the request body separates a password sign-in ('login') from the app
+// being reopened with a session that was still valid ('resume').
 
 import { corsHeaders, getCaller, json, serviceClient } from '../_shared/admin.ts';
 
@@ -61,6 +64,11 @@ Deno.serve(async (req) => {
   const caller = await getCaller(req);
   if (!caller) return json({ error: 'Unauthorized' }, 401);
 
+  // Whitelisted rather than trusted, and defaulted so a body-less call from an
+  // older client still records a plain sign-in.
+  const body = await req.json().catch(() => ({}));
+  const kind = body?.kind === 'resume' ? 'resume' : 'login';
+
   const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim();
   const geo = await resolveIp(ip);
   const browser = parseBrowser(req.headers.get('user-agent') ?? '');
@@ -72,6 +80,7 @@ Deno.serve(async (req) => {
     region: geo.region,
     country: geo.country,
     browser,
+    kind,
   });
   if (error) return json({ error: error.message }, 500);
 

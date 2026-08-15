@@ -43,6 +43,9 @@ export interface Profile {
   created_at: string;
 }
 
+/** 'login' = password sign-in, 'resume' = app opened with a live session. */
+export type LoginKind = 'login' | 'resume';
+
 export interface LoginLog {
   id: string;
   user_id: string;
@@ -52,5 +55,33 @@ export interface LoginLog {
   region: string;
   country: string;
   browser: string;
+  kind: LoginKind;
   profiles?: Pick<Profile, 'email' | 'full_name'> | null;
+}
+
+/** Kept in step with the check constraint on activity_events.event_type. */
+export type ActivityEventType = 'school_view' | 'search' | 'filter';
+
+export interface ActivityEvent {
+  id: string;
+  user_id: string;
+  occurred_at: string;
+  event_type: ActivityEventType;
+  university_id: string | null;
+  /** School name at view time, the settled query, or `region=Seoul` / `reset`. */
+  detail: string;
+  result_count: number | null;
+  profiles?: Pick<Profile, 'email' | 'full_name'> | null;
+}
+
+/** One row per staff member, as returned by the activity_summary RPC. */
+export interface ActivitySummaryRow {
+  user_id: string;
+  full_name: string;
+  email: string;
+  last_access_at: string | null;
+  sessions: number;
+  actions: number;
+  schools_viewed: number;
+  searches: number;
 }

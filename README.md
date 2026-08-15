@@ -22,6 +22,9 @@ to **Vercel**; everything fits in the free tiers.
   (create / disable / re-enable / password reset), login log dashboard
 - 🕒 Login tracking: each login records IP → city/country (via ip-api.com) and
   browser/device, with unexpected-country highlighting
+- 📊 Activity tracking: every app open, school profile opened, search and filter
+  is recorded, summarised per staff member over a date range with a detailed
+  drill-down; activity data is kept for 30 days
 
 ## Quick start (demo mode)
 
@@ -44,10 +47,11 @@ so every screen is browsable. Admin edits are kept in memory only.
 1. **Create a project** at [supabase.com](https://supabase.com) (free tier).
 
 2. **Run the migration**: paste `supabase/migrations/0001_init.sql` into the
-   SQL editor (or `supabase db push`). It creates the `universities`,
-   `profiles` and `login_logs` tables, RLS policies, the profile-creation
-   trigger, and the public `university-images` Storage bucket with
-   admin-only write policies.
+   SQL editor (or `supabase db push`), then the later numbered files in the
+   same folder. They create the `universities`, `profiles`, `login_logs` and
+   `activity_events` tables, RLS policies, the profile-creation trigger, and
+   the public `university-images` Storage bucket with admin-only write
+   policies. (`supabase/production_setup.sql` does all of it in one go.)
 
 3. **Deploy the Edge Functions** (they hold the service-role key — privileged
    operations never run in the browser):
@@ -93,7 +97,7 @@ src/
   data/       bundled sample dataset (demo mode)
   auth/       AuthContext, login page, route guards
   map/        map view, marker clustering, filter bar, detail drawer
-  admin/      university CRUD + uploads, accounts, login logs
+  admin/      university CRUD + uploads, accounts, login logs, staff activity
 supabase/
   migrations/ schema + RLS + storage policies
   functions/  create-user, manage-user, log-login (Deno Edge Functions)
@@ -106,4 +110,5 @@ supabase/
 - ip-api.com free tier is HTTP-only (~45 req/min) — plenty for login events.
 - Compress images before upload (≤ ~1600px) to stay within the Storage free tier;
   deleting a school or photo also removes its files from Storage.
-- Inform sales staff that login locations are recorded.
+- Inform sales staff that login locations **and in-app activity** (schools
+  opened, searches, filters) are recorded.

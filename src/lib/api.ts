@@ -1,6 +1,14 @@
 import { demoStore } from './demoStore';
 import { isDemoMode, requireSupabase } from './supabase';
-import type { LoginLog, Profile, University, UniversityInput } from './types';
+import type {
+  ActivityEvent,
+  ActivitySummaryRow,
+  LoginKind,
+  LoginLog,
+  Profile,
+  University,
+  UniversityInput,
+} from './types';
 
 const BUCKET = 'university-images';
 
@@ -199,10 +207,51 @@ export async function fetchLoginLogs(): Promise<LoginLog[]> {
   return data ?? [];
 }
 
-/** Fire-and-forget: record the login server-side (IP → city/country, UA). */
-export function logLogin(): void {
+/**
+ * Fire-and-forget: record the access server-side (IP → city/country, UA).
+ * `kind` distinguishes a password sign-in from the app being reopened with a
+ * session that was still valid; the Edge Function whitelists it.
+ */
+export function logLogin(kind: LoginKind = 'login'): void {
   if (isDemoMode) return;
   void requireSupabase()
-    .functions.invoke('log-login')
+    .functions.invoke('log-login', { body: { kind } })
     .catch((err) => console.warn('log-login failed:', err));
+}
+
+// ---------------------------------------------------------------------------
+// Activity tracking — see src/lib/activity.ts for the buffering side
+// ---------------------------------------------------------------------------
+
+/** Rows returned by one drill-down query; the page says so when it hits this. */
+export const ACTIVITY_EVENT_LIMIT = 300;
+
+export async function fetchActivitySummary(
+  fromIso: string,
+  toIso: string,
+): Promise<ActivitySummaryRow[]> {
+  if (isDemoMode) return demoStore.activitySummary(fromIso, toIso);
+  const { data, error } = await requireSupabase()
+    .rpc('activity_summary', { from_ts: fromIso, to_ts: toIso });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function fetchActivityEvents(opts: {
+  userId?: string;
+  fromIso: string;
+  toIso: string;
+}): Promise<ActivityEvent[]> {
+  if (isDemoMode) return demoStore.listActivityEvents(opts);
+  let query = requireSupabase()
+    .from('activity_events')
+    .select('*, profiles(email, full_name)')
+    .gte('occurred_at', opts.fromIso)
+    .lt('occurred_at', opts.toIso);
+  if (opts.userId) query = query.eq('user_id', opts.userId);
+  const { data, error } = await query
+    .order('occurred_at', { ascending: false })
+    .limit(ACTIVITY_EVENT_LIMIT);
+  if (error) throw error;
+  return data ?? [];
 }

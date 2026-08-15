@@ -17,6 +17,7 @@ export default function AdminLayout() {
           <NavLink to="/admin/universities">🏫 Trường đại học</NavLink>
           <NavLink to="/admin/accounts">👥 Tài khoản Sale</NavLink>
           <NavLink to="/admin/logs">🕒 Nhật ký đăng nhập</NavLink>
+          <NavLink to="/admin/activity">📊 Hoạt động nhân viên</NavLink>
         </nav>
         <main className="admin-main">
           {isDemoMode && (

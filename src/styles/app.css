@@ -762,6 +762,9 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   margin-bottom: 1rem;
 }
 .inline-label { font-size: 0.8rem; color: var(--muted); }
+.range-presets { display: flex; gap: 0.35rem; }
+/* Counts read as a column, so right-align them and keep the digits monospaced. */
+.summary-num { text-align: right; font-variant-numeric: tabular-nums; }
 
 /* ---------- expandable content + overlay ---------- */
 /* Tall content (the faculty/major table above all) is clamped, with a button

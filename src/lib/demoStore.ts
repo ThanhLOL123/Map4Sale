@@ -1,5 +1,21 @@
 import sampleData from '../data/universities.sample.json';
-import type { LoginLog, Profile, University, UniversityInput } from './types';
+import type {
+  ActivityEvent,
+  ActivitySummaryRow,
+  LoginLog,
+  Profile,
+  University,
+  UniversityInput,
+} from './types';
+
+/**
+ * Fixture timestamps are relative to load time, not hardcoded dates: the
+ * activity screen defaults to the last 7 days, and fixed dates would age out
+ * and leave the demo showing an empty screen.
+ */
+function hoursAgo(h: number): string {
+  return new Date(Date.now() - h * 3_600_000).toISOString();
+}
 
 /**
  * In-memory data store used when the app runs without Supabase credentials
@@ -49,44 +65,159 @@ let loginLogs: LoginLog[] = [
   {
     id: 'log-1',
     user_id: 'demo-sale-0001',
-    login_at: '2026-07-10T01:12:00Z',
+    login_at: hoursAgo(3),
     ip_address: '113.161.72.10',
     city: 'Hà Nội',
     region: 'Hanoi',
     country: 'Vietnam',
     browser: 'Chrome (Windows)',
+    kind: 'login',
   },
   {
     id: 'log-2',
     user_id: 'demo-sale-0002',
-    login_at: '2026-07-10T02:40:00Z',
+    login_at: hoursAgo(6),
     ip_address: '115.78.5.44',
     city: 'TP. Hồ Chí Minh',
     region: 'Ho Chi Minh',
     country: 'Vietnam',
     browser: 'Safari (macOS)',
+    kind: 'login',
   },
   {
     id: 'log-3',
     user_id: 'demo-sale-0001',
-    login_at: '2026-07-09T08:03:00Z',
+    login_at: hoursAgo(27),
     ip_address: '175.213.9.81',
     city: 'Seoul',
     region: 'Seoul',
     country: 'South Korea',
     browser: 'Chrome (Android)',
+    kind: 'resume',
   },
   {
     id: 'log-4',
+    user_id: 'demo-sale-0002',
+    login_at: hoursAgo(50),
+    ip_address: '115.78.5.44',
+    city: 'TP. Hồ Chí Minh',
+    region: 'Ho Chi Minh',
+    country: 'Vietnam',
+    browser: 'Safari (macOS)',
+    kind: 'resume',
+  },
+  {
+    id: 'log-5',
     user_id: 'demo-sale-0003',
-    login_at: '2026-07-08T22:55:00Z',
+    login_at: hoursAgo(74),
     ip_address: '89.187.178.12',
     city: 'Frankfurt',
     region: 'Hesse',
     country: 'Germany',
     browser: 'Firefox (Windows)',
+    kind: 'login',
   },
 ];
+
+/** Sample ids from universities.sample.json, so the drill-down links up. */
+const DEMO_SCHOOLS: Array<[string, string]> = [
+  ['d1000000-0000-4000-8000-000000000001', 'Đại học Quốc gia Seoul'],
+  ['d1000000-0000-4000-8000-000000000002', 'Viện KH&CN tiên tiến Hàn Quốc (KAIST)'],
+  ['d1000000-0000-4000-8000-000000000003', 'Đại học Yonsei'],
+  ['d1000000-0000-4000-8000-000000000004', 'Đại học Korea'],
+  ['d1000000-0000-4000-8000-000000000005', 'Đại học KH&CN Pohang (POSTECH)'],
+];
+
+function demoSchoolView(id: string, userId: string, h: number, school: number): ActivityEvent {
+  const [universityId, name] = DEMO_SCHOOLS[school];
+  return {
+    id,
+    user_id: userId,
+    occurred_at: hoursAgo(h),
+    event_type: 'school_view',
+    university_id: universityId,
+    detail: name,
+    result_count: null,
+  };
+}
+
+let activityEvents: ActivityEvent[] = [
+  demoSchoolView('act-1', 'demo-sale-0001', 2.9, 0),
+  demoSchoolView('act-2', 'demo-sale-0001', 2.8, 2),
+  demoSchoolView('act-3', 'demo-sale-0001', 2.7, 3),
+  {
+    id: 'act-4',
+    user_id: 'demo-sale-0001',
+    occurred_at: hoursAgo(2.6),
+    event_type: 'search',
+    university_id: null,
+    detail: 'seoul',
+    result_count: 5,
+  },
+  {
+    id: 'act-5',
+    user_id: 'demo-sale-0001',
+    occurred_at: hoursAgo(2.5),
+    event_type: 'filter',
+    university_id: null,
+    detail: 'region=Seoul',
+    result_count: 11,
+  },
+  demoSchoolView('act-6', 'demo-sale-0001', 2.4, 1),
+  demoSchoolView('act-7', 'demo-sale-0001', 26.5, 4),
+  {
+    id: 'act-8',
+    user_id: 'demo-sale-0001',
+    occurred_at: hoursAgo(26.4),
+    event_type: 'search',
+    university_id: null,
+    detail: 'kaist',
+    result_count: 1,
+  },
+  demoSchoolView('act-9', 'demo-sale-0002', 5.8, 3),
+  demoSchoolView('act-10', 'demo-sale-0002', 5.7, 4),
+  {
+    id: 'act-11',
+    user_id: 'demo-sale-0002',
+    occurred_at: hoursAgo(5.6),
+    event_type: 'filter',
+    university_id: null,
+    detail: 'maxTuition=4',
+    result_count: 9,
+  },
+  {
+    id: 'act-12',
+    user_id: 'demo-sale-0002',
+    occurred_at: hoursAgo(5.5),
+    event_type: 'search',
+    university_id: null,
+    detail: 'y khoa',
+    result_count: 0,
+  },
+  {
+    id: 'act-13',
+    user_id: 'demo-sale-0002',
+    occurred_at: hoursAgo(5.4),
+    event_type: 'filter',
+    university_id: null,
+    detail: 'reset',
+    result_count: 22,
+  },
+  demoSchoolView('act-14', 'demo-sale-0002', 49.5, 0),
+  demoSchoolView('act-15', 'demo-sale-0002', 49.4, 1),
+  demoSchoolView('act-16', 'demo-sale-0003', 73.5, 2),
+  {
+    id: 'act-17',
+    user_id: 'demo-sale-0003',
+    occurred_at: hoursAgo(73.4),
+    event_type: 'search',
+    university_id: null,
+    detail: 'busan',
+    result_count: 2,
+  },
+];
+
+let activitySeq = activityEvents.length;
 
 function withProfile(log: LoginLog): LoginLog {
   const p = profiles.find((x) => x.id === log.user_id);
@@ -135,5 +266,60 @@ export const demoStore = {
     return loginLogs
       .map(withProfile)
       .sort((a, b) => b.login_at.localeCompare(a.login_at));
+  },
+
+  recordActivityEvents(rows: Omit<ActivityEvent, 'id'>[]): void {
+    // Demo has no auth, so events are attributed to the demo admin.
+    activityEvents = [
+      ...activityEvents,
+      ...rows.map((r) => ({ ...r, id: `act-${++activitySeq}`, user_id: DEMO_ADMIN.id })),
+    ];
+  },
+
+  listActivityEvents(opts: { userId?: string; fromIso: string; toIso: string }): ActivityEvent[] {
+    return activityEvents
+      .filter((e) => {
+        if (opts.userId && e.user_id !== opts.userId) return false;
+        return e.occurred_at >= opts.fromIso && e.occurred_at < opts.toIso;
+      })
+      .map((e) => ({
+        ...e,
+        profiles: (() => {
+          const p = profiles.find((x) => x.id === e.user_id);
+          return p ? { email: p.email, full_name: p.full_name } : null;
+        })(),
+      }))
+      .sort((a, b) => b.occurred_at.localeCompare(a.occurred_at))
+      .slice(0, 300);
+  },
+
+  /** JS mirror of the activity_summary RPC (see migration 0006). */
+  activitySummary(fromIso: string, toIso: string): ActivitySummaryRow[] {
+    return profiles
+      .map((p) => {
+        const logins = loginLogs.filter(
+          (l) => l.user_id === p.id && l.login_at >= fromIso && l.login_at < toIso,
+        );
+        const events = activityEvents.filter(
+          (e) => e.user_id === p.id && e.occurred_at >= fromIso && e.occurred_at < toIso,
+        );
+        const times = [...logins.map((l) => l.login_at), ...events.map((e) => e.occurred_at)];
+        return {
+          user_id: p.id,
+          full_name: p.full_name,
+          email: p.email,
+          last_access_at: times.length ? times.sort()[times.length - 1] : null,
+          sessions: logins.length,
+          actions: events.length,
+          // count(distinct) skips nulls in Postgres; match that here.
+          schools_viewed: new Set(
+            events
+              .filter((e) => e.event_type === 'school_view' && e.university_id)
+              .map((e) => e.university_id),
+          ).size,
+          searches: events.filter((e) => e.event_type === 'search').length,
+        };
+      })
+      .sort((a, b) => (b.last_access_at ?? '').localeCompare(a.last_access_at ?? ''));
   },
 };

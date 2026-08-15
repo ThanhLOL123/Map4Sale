@@ -37,13 +37,19 @@ Edge Functions are Deno, not part of the npm build. They deploy via `supabase fu
 - `src/lib/useUniversityBrowser.ts` is the shared hook for the map and docked-list views: one fetch, shared filter + selection state.
 - `src/lib/filters.ts`: tuition is stored as free text; the max-tuition filter parses the *first number* in the string as million KRW per semester.
 
+### Activity tracking
+
+`src/lib/activity.ts` is the only tracker: `trackEvent()` buffers events and flushes them in batches with `fetch(..., { keepalive: true })` — **direct PostgREST inserts under RLS, not an Edge Function** (the trigger already stamps identity and time, and a function could not tell a real click from a scripted one either). `Prefer: return=minimal` is load-bearing: asking for the inserted rows back would need a select policy sale users must not have.
+
+Events are emitted from one place — `useUniversityBrowser` wraps `setSelected` / `setFilters`, so every map pin, list row and filter control is instrumented without touching components. Search is debounced (the box fires per keystroke). Admin view: `src/admin/ActivityPage.tsx`, backed by the `activity_summary` RPC; a daily GitHub Action enforces 30-day retention.
+
 ### Privileged operations → Edge Functions
 
 Anything needing the service-role key runs in `supabase/functions/` (Deno), never in the browser:
 
 - `create-user` — creates a sale account. **No-email flow**: generates a random password and returns it once for the admin to hand over (avoids Supabase's built-in mailer rate limit).
 - `manage-user` — actions `enable` / `disable` / `reset_password` (reset also returns a new password).
-- `log-login` — fire-and-forget on sign-in; resolves IP → city/country via ip-api.com and records browser/device.
+- `log-login` — fire-and-forget on each app open; resolves IP → city/country via ip-api.com and records browser/device. The request body's `kind` (whitelisted server-side) separates a password sign-in from a session resume.
 
 `_shared/admin.ts` holds the shared plumbing: CORS headers, `serviceClient()` (service-role, bypasses RLS), `getCaller()` (resolves the JWT from the Authorization header), and `callerIsAdmin()`. `create-user` and `manage-user` verify the caller is an active admin before acting.
 
@@ -54,6 +60,7 @@ Two roles: `admin` and `sale` (in `public.profiles`, auto-created by a trigger o
 - `universities`: any *active* authenticated user reads; only admins write.
 - `profiles`: users read their own row; admins read/update all.
 - `login_logs`: admin read only; rows inserted by `log-login` with the service role.
+- `activity_events`: an active user inserts *only their own* rows, admin read only, no update/delete policy at all — `user_id` and `occurred_at` are stamped by a `before insert` trigger, so neither can be forged.
 - Storage: public read; admin-only write.
 
 Deactivated accounts (`is_active = false`) are signed out client-side by `AuthContext` and blocked from data by the `is_active_user()` RLS helper. Routes: `/` (map) requires login; `/admin/*` requires admin — both enforced by `ProtectedRoute` in `src/App.tsx`.

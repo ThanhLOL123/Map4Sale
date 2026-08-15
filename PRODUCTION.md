@@ -71,6 +71,12 @@ re-running one is harmless:
 - `0004_add_majors_detail.sql` — adds the "Giới thiệu khoa – chuyên ngành"
   rich-text column. Without it the profile section stays empty and saving a
   university fails on the unknown column.
+- `0005_add_is_featured.sql` — adds the "Nổi bật" flag (the ★ in the school
+  list). Without it, saving a university fails on the unknown column.
+- `0006_activity_tracking.sql` — adds `login_logs.kind`, the `activity_events`
+  table with its stamping trigger and RLS, and the `activity_summary` function
+  behind **Quản trị → Hoạt động nhân viên**. Without it that page errors and
+  tracking writes are rejected.
 
 `supabase/production_setup.sql` already contains every column for a fresh
 install; the migrations are only for databases created before a change.
@@ -119,6 +125,20 @@ account-creation emails, set up custom SMTP in **Authentication → Emails → S
   then download the `db-backup` artifact to confirm.
 - ⚠️ **Keep this repository private** — backup artifacts contain the full database.
 
+## 8. Turn on the 30-day activity purge
+The **Hoạt động nhân viên** screen tells staff their activity is kept for 30 days;
+this workflow is what makes that true.
+
+- It uses the **same `SUPABASE_DB_URL` secret** as step 7 — if you did that step,
+  there is nothing to add here.
+- GitHub **Actions** tab → *Purge old activity data* → **Run workflow** to test it.
+  It runs daily at 01:20 giờ Việt Nam thereafter.
+- It deletes `activity_events` and "Mở lại" rows older than 30 days. Password
+  sign-ins are kept indefinitely as the security audit trail.
+- ⚠️ GitHub disables scheduled workflows after **60 days without repo activity**.
+  If the repo goes quiet, re-enable it from the Actions tab, or the purge stops
+  silently while the app keeps promising 30-day retention.
+
 ---
 
 ## Go-live verification checklist
@@ -134,6 +154,10 @@ Once steps 1–5 are done, confirm the live system end-to-end:
 - [ ] Log in as that sale user → a row appears in **Quản trị → Nhật ký đăng nhập**
       with city/country (real IP; localhost shows blank — that's expected).
 - [ ] **Quản trị → Sao lưu → Tải bản sao lưu** downloads a `.json` of live data.
+- [ ] As that sale user, open a few schools and run a search; then in
+      **Quản trị → Hoạt động nhân viên** (7 ngày) their row shows a recent
+      "Lần truy cập gần nhất" and a non-zero "Số thao tác", with the actions
+      listed in the drill-down below.
 
 ## Rolling back
 Removing the two `VITE_SUPABASE_*` env vars in Vercel and redeploying returns the

@@ -63,6 +63,7 @@ export default function LoginLogsPage() {
         <thead>
           <tr>
             <th>Nhân viên</th>
+            <th>Loại</th>
             <th>Thời gian</th>
             <th>Thành phố</th>
             <th>Quốc gia</th>
@@ -76,6 +77,7 @@ export default function LoginLogsPage() {
             return (
               <tr key={log.id} className={suspicious ? 'row-warning' : ''}>
                 <td>{log.profiles?.full_name || log.profiles?.email || log.user_id}</td>
+                <td>{log.kind === 'resume' ? 'Mở lại' : 'Đăng nhập'}</td>
                 <td>{new Date(log.login_at).toLocaleString('vi-VN')}</td>
                 <td>{log.city || '—'}</td>
                 <td>
@@ -89,7 +91,7 @@ export default function LoginLogsPage() {
           })}
           {shown.length === 0 && (
             <tr>
-              <td colSpan={6} className="muted">Chưa có lượt đăng nhập nào.</td>
+              <td colSpan={7} className="muted">Chưa có lượt đăng nhập nào.</td>
             </tr>
           )}
         </tbody>
