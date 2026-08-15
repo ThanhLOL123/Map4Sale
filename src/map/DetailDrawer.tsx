@@ -114,13 +114,9 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
         </Section>
       )}
 
-      <Section title="🎓 Ngành đào tạo">
-        <div className="chips">
-          {u.majors.map((m) => (
-            <span key={m} className="chip">{m}</span>
-          ))}
-        </div>
-      </Section>
+      {/* The flat `majors` chip list is deliberately not shown: the faculty table
+          and the tuition section below cover the same ground in the shape the
+          brochure uses. The field itself stays — it drives the Ngành filter. */}
 
       {u.majors_detail && (
         <Section title="🏛️ Giới thiệu khoa – chuyên ngành">
@@ -132,7 +128,7 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
         </Section>
       )}
 
-      <Section title="💰 Học phí">
+      <Section title="💰 Ngành học và học phí">
         <RichText value={u.tuition} />
       </Section>
 
