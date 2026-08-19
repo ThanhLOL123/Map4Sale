@@ -11,8 +11,9 @@ interface Props {
   /** Visible rows, roughly — matches the old textarea sizing. */
   minRows?: number;
   /**
-   * Adds the table tools. Off by default so only Học phí — where tuition
-   * varies by faculty — carries the extra toolbar group.
+   * Adds the table tools — the TableKit extension plus its toolbar group.
+   * Every field in the university form passes this; it stays a prop so the
+   * editor is still usable without the extra 11 buttons.
    */
   withTable?: boolean;
 }

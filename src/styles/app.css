@@ -781,6 +781,15 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   background: linear-gradient(to bottom, transparent, var(--surface));
   pointer-events: none;
 }
+/* Inside the two warning-coloured boxes the fade has to end in their colour,
+   not the drawer surface, or the cut edge reads as a rendering fault. The
+   selectors differ because the boxes attach at different levels: .important-notes
+   wraps the RichText, while .sale-notes is RichText's own class and so lands
+   inside the clamp. */
+.important-notes .rich-text-clamp::after,
+.rich-text-clamp:has(.sale-notes)::after {
+  background: linear-gradient(to bottom, transparent, var(--warning-bg));
+}
 .rich-text-expand {
   margin-top: 0.4rem;
   padding: 0.35rem 0.8rem;
@@ -951,8 +960,7 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 .rich-text a { color: var(--brand); }
 .rich-text mark { background: #fef08a; padding: 0 0.15em; border-radius: 3px; }
 
-/* Tables. Only the Học phí editor can create them, but the styles are shared
-   because content can be pasted into any field.
+/* Tables. Every rich-text editor can create them, and the styles are shared.
    The drawer is only 430px wide, so a wide table has to scroll inside its own
    box rather than stretch the sheet — hence overflow-x on the container. */
 .rich-text { overflow-x: auto; }

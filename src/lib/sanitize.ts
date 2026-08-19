@@ -21,8 +21,8 @@ const ALLOWED_TAGS = [
   'a',
   'h2', 'h3',
   'span', 'mark',
-  // Tables — only reachable from the Học phí editor, but the sanitiser is
-  // shared, so any field could legitimately hold one after a copy-paste.
+  // Tables — every rich-text editor can insert one, and the sanitiser is
+  // shared, so any field may legitimately hold one.
   'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'colgroup', 'col',
 ];
 

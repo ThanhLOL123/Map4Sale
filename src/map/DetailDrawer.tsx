@@ -90,7 +90,11 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
       {u.important_notes && (
         <div className="important-notes" role="note">
           <span className="important-notes-title">⚠️ Thông tin lưu ý quan trọng</span>
-          <RichText value={u.important_notes} />
+          <RichText
+            value={u.important_notes}
+            expandable
+            title="Thông tin lưu ý quan trọng"
+          />
         </div>
       )}
 
@@ -129,11 +133,11 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
       )}
 
       <Section title="💰 Ngành học và học phí">
-        <RichText value={u.tuition} />
+        <RichText value={u.tuition} expandable title="Ngành học và học phí" />
       </Section>
 
       <Section title="🏅 Học bổng">
-        <RichText value={u.scholarship} />
+        <RichText value={u.scholarship} expandable title="Học bổng" />
       </Section>
 
       <Section title="📋 Điều kiện đầu vào">
@@ -145,16 +149,21 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
       </Section>
 
       <Section title="🏠 Ký túc xá">
-        <RichText value={u.dorm_info} />
+        <RichText value={u.dorm_info} expandable title="Ký túc xá" />
       </Section>
 
       <Section title="🍜 Chi phí sinh hoạt">
-        <RichText value={u.living_cost} />
+        <RichText value={u.living_cost} expandable title="Chi phí sinh hoạt" />
       </Section>
 
       {u.sale_notes && (
         <Section title="📝 Ghi chú">
-          <RichText value={u.sale_notes} className="sale-notes" />
+          <RichText
+            value={u.sale_notes}
+            className="sale-notes"
+            expandable
+            title="Ghi chú"
+          />
         </Section>
       )}
 

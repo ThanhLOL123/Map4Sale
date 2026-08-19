@@ -415,28 +415,33 @@ export default function UniversityFormPage() {
           label="Học bổng"
           value={form.scholarship}
           onChange={(html) => set('scholarship', html)}
+          withTable
         />
         <RichField
           label="Ký túc xá"
           value={form.dorm_info}
           onChange={(html) => set('dorm_info', html)}
+          withTable
         />
         <RichField
           label="Chi phí sinh hoạt"
           value={form.living_cost}
           onChange={(html) => set('living_cost', html)}
+          withTable
         />
         <RichField
           label="Thông tin lưu ý quan trọng (hiển thị cho Sale)"
           value={form.important_notes}
           onChange={(html) => set('important_notes', html)}
           minRows={4}
+          withTable
         />
         <RichField
           label="Ghi chú"
           value={form.sale_notes}
           onChange={(html) => set('sale_notes', html)}
           minRows={4}
+          withTable
         />
       </fieldset>
     </form>
