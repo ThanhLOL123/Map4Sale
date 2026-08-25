@@ -42,6 +42,12 @@ interface Props {
   onSortChange: (s: SortKey) => void;
   /** Live search text; when set, rows are ordered by how well they match it. */
   query: string;
+  loading: boolean;
+  /** Schools before filtering — tells "database is empty" from "nothing matched". */
+  totalCount: number;
+  hoveredId: string | null;
+  onHover: (u: University | null, from: 'list') => void;
+  onClearFilters: () => void;
 }
 
 /** Docked, scrollable compact-rows list beside the map. */
@@ -52,6 +58,11 @@ export default function SideList({
   sort,
   onSortChange,
   query,
+  loading,
+  totalCount,
+  hoveredId,
+  onHover,
+  onClearFilters,
 }: Props) {
   const rows = useMemo(
     () => sortUniversities(universities, sort, query),
@@ -85,8 +96,16 @@ export default function SideList({
               <button
                 type="button"
                 ref={selected?.id === u.id ? activeRow : null}
-                className={`uni-row${selected?.id === u.id ? ' uni-row-active' : ''}`}
+                className={
+                  `uni-row${selected?.id === u.id ? ' uni-row-active' : ''}` +
+                  `${hoveredId === u.id ? ' uni-row-hover' : ''}`
+                }
                 onClick={() => onSelect(u)}
+                // Focus mirrors hover so keyboard users get the same pin highlight.
+                onMouseEnter={() => onHover(u, 'list')}
+                onMouseLeave={() => onHover(null, 'list')}
+                onFocus={() => onHover(u, 'list')}
+                onBlur={() => onHover(null, 'list')}
               >
                 {u.logo_url ? (
                   <img src={u.logo_url} alt="" className="uni-row-logo" />
@@ -114,11 +133,26 @@ export default function SideList({
               </button>
             </li>
           ))}
+          {/* This panel is the only place these states are reported — there is
+              deliberately nothing floating over the middle of the map. */}
           {rows.length === 0 && (
             <li className="uni-list-empty muted">
-              {query.trim()
-                ? `Không có ngành nào khớp “${query.trim()}”.`
-                : 'Không có trường nào khớp bộ lọc.'}
+              {loading ? (
+                <>
+                  <span className="map-spinner" aria-hidden /> Đang tải dữ liệu trường…
+                </>
+              ) : totalCount === 0 ? (
+                'Chưa có trường nào trong hệ thống.'
+              ) : (
+                <>
+                  {query.trim()
+                    ? `Không có ngành nào khớp “${query.trim()}”.`
+                    : 'Không có trường nào khớp bộ lọc.'}
+                  <button type="button" className="btn btn-ghost" onClick={onClearFilters}>
+                    Xóa lọc
+                  </button>
+                </>
+              )}
             </li>
           )}
         </ul>

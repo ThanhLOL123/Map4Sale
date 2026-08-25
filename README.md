@@ -17,7 +17,8 @@ to **Vercel**; everything fits in the free tiers.
 - 🎥 Videos per school — admin uploads a file or pastes a link (YouTube/Vimeo/direct)
 - 🔎 Search by **ngành học**: accent- and word-order-insensitive ("quan tri kinh doanh"
   finds "Quản trị kinh doanh"), best match first; plus filters for region, major,
-  school type, max tuition and ranking, with a docked list beside the map
+  school type, max tuition and ranking. Results are listed in a docked panel on
+  the left; hovering a result highlights that school's pin on the map (and back)
 - 🔐 Email/password login (Supabase Auth) with `admin` / `sale` roles and RLS
 - 🛠️ Admin panel: university CRUD (coordinates by map click or Nominatim geocoding),
   logo & photo uploads to Supabase Storage, sales-account management

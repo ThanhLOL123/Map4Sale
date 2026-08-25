@@ -201,7 +201,9 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   font: inherit;
   color: var(--text);
 }
-.uni-row:hover { border-color: var(--brand); box-shadow: 0 2px 8px rgb(0 0 0 / 0.06); }
+.uni-row:hover,
+/* Set from the map side: hovering a pin lights up its row here. */
+.uni-row-hover { border-color: var(--brand); box-shadow: 0 2px 8px rgb(0 0 0 / 0.06); }
 .uni-row-active { border-color: var(--brand); background: #eff6ff; }
 .uni-row-logo {
   width: 40px;
@@ -307,7 +309,8 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 .filter-backdrop { display: none; }
 .map-error { padding: 0.5rem 1rem; }
 
-/* Map on the left, docked list panel on the right. */
+/* Docked results panel on the left, map filling the rest. SideList is rendered
+   before the map in MapView so DOM order matches what is on screen. */
 .map-body { flex: 1; min-height: 0; display: flex; }
 .map-wrap { position: relative; flex: 1; min-height: 0; min-width: 0; }
 /* The sea shows through wherever the province polygons don't reach; it is only
@@ -321,7 +324,7 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   flex-direction: column;
   min-height: 0;
   background: var(--surface);
-  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
 }
 
 /* In-screen Map/List switch — phones only (hidden on desktop). */
@@ -485,6 +488,21 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 /* Selected school: bigger, accent-ringed, lifted (z-order via zIndexOffset).
    Animated rather than transitioned — setIcon() replaces the icon's children,
    and a transition never plays on a freshly inserted element. */
+/* Hovering a row in the list rings its pin. Brand blue, not the green accent of
+   the selected state, and no animation: setIcon() rebuilds the element, so a pop
+   would replay on every row the pointer crosses. */
+.school-pin-hover .school-pin-head {
+  transform: translateX(-50%) scale(1.12);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgb(29 78 216 / 0.25), var(--shadow-pin);
+}
+.school-pin-hover .school-pin-head::after { border-top-color: var(--brand); }
+.school-pin-hover .school-pin-label {
+  background: var(--brand);
+  border-color: var(--brand-dark);
+  color: #fff;
+}
+
 @keyframes pin-pop {
   0% { transform: translateX(-50%) scale(0.75); }
   60% { transform: translateX(-50%) scale(1.32); }
@@ -557,29 +575,12 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   stroke-linecap: round;
 }
 
-.map-status {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.7rem 1.1rem;
-  border-radius: 12px;
-  background: var(--surface);
-  box-shadow: var(--shadow-float);
-  font-size: 0.9rem;
-  color: var(--muted);
-  white-space: nowrap;
-  pointer-events: none; /* don't block panning the map underneath */
-}
-.map-status .btn { pointer-events: auto; }
+/* Loading, empty-database and no-match states are reported in the results panel,
+   never floating over the middle of the map. The spinner below is all that
+   survives of the old .map-status card. */
 
-/* With the drawer open, keep both overlays inside the strip it leaves free. */
+/* With the drawer open, keep the controls inside the strip it leaves free. */
 .map-wrap.has-detail .map-controls { right: calc(var(--drawer-w) + 1rem); }
-.map-wrap.has-detail .map-status { left: calc(50% - var(--drawer-w) / 2); }
 .map-spinner {
   width: 16px;
   height: 16px;
@@ -1087,19 +1088,17 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   }
   .map-page.mobile-map .side-list { display: none; }
   .map-page.mobile-list .map-wrap { display: none; }
-  .side-list { width: 100%; border-left: none; }
+  .side-list { width: 100%; border-right: none; }
 
   /* Stay top-right: the bottom-right corner belongs to the attribution, and
      the detail sheet (z-index 1000) correctly covers these when it opens. */
   /* The sheet spans the full width, so the desktop side-shift must not leak. */
   .map-controls,
   .map-wrap.has-detail .map-controls { top: 0.6rem; right: 0.6rem; }
-  .map-wrap.has-detail .map-status { left: 50%; }
   .map-control { width: 40px; height: 40px; }
   .school-pin-label { max-width: 96px; font-size: 10px; }
   /* 12px province names crowd the whole peninsula on a phone-width map. */
   .province-label-text { font-size: 10px; }
-  .map-status { max-width: calc(100% - 2rem); white-space: normal; }
 
   .view-toggle-label { display: none; }
   .view-toggle a { padding: 0.3rem 0.6rem; }

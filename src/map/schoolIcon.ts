@@ -31,14 +31,20 @@ function headHtml(u: University): string {
 
 /**
  * Build the marker for one school. `selected` swaps in the enlarged accent
- * variant — callers must memoize per (university, selected) so react-leaflet
- * only calls `setIcon()` when the state actually changes.
+ * variant, `hovered` the lighter ring used while the pointer is over that
+ * school's row in the list — callers must memoize per (university, selected,
+ * hovered) so react-leaflet only calls `setIcon()` when the state changes.
  */
-export function createSchoolIcon(u: University, selected: boolean): L.DivIcon {
+export function createSchoolIcon(
+  u: University,
+  selected: boolean,
+  hovered = false,
+): L.DivIcon {
   const className = [
     'school-pin',
     `school-pin-${u.type}`,
     selected ? 'school-pin-selected' : '',
+    hovered && !selected ? 'school-pin-hover' : '',
   ]
     .filter(Boolean)
     .join(' ');

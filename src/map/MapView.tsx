@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import L, { type Map as LeafletMap } from 'leaflet';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -105,13 +105,21 @@ function MapController({
 function SchoolMarker({
   university,
   selected,
+  hovered,
   onSelect,
+  onHover,
 }: {
   university: University;
   selected: boolean;
+  /** True only for a hover that started in the list — see the note below. */
+  hovered: boolean;
   onSelect: (u: University) => void;
+  onHover: (u: University | null, from: 'map') => void;
 }) {
-  const icon = useMemo(() => createSchoolIcon(university, selected), [university, selected]);
+  const icon = useMemo(
+    () => createSchoolIcon(university, selected, hovered),
+    [university, selected, hovered],
+  );
 
   return (
     <Marker
@@ -120,7 +128,15 @@ function SchoolMarker({
       // Leaflet derives each marker's z-index from latitude, so CSS alone
       // cannot lift the active pin above its neighbours.
       zIndexOffset={selected ? 1000 : 0}
-      eventHandlers={{ click: () => onSelect(university) }}
+      eventHandlers={{
+        click: () => onSelect(university),
+        // Highlights the row in the list. It deliberately does NOT rebuild this
+        // icon: setIcon() swaps the DOM node out from under the pointer, which
+        // would fire mouseout and oscillate. The pin under the mouse is already
+        // brightened by the .school-pin:hover rule.
+        mouseover: () => onHover(university, 'map'),
+        mouseout: () => onHover(null, 'map'),
+      }}
     />
   );
 }
@@ -160,8 +176,13 @@ export default function MapView() {
     return () => clearTimeout(t);
   }, [presentation, map]);
 
-  const noneAtAll = !loading && !error && universities.length === 0;
-  const noneMatching = !loading && !error && universities.length > 0 && filtered.length === 0;
+  // Which school the pointer is over, and where the pointer is. `from` is what
+  // keeps the two directions from fighting: only a hover that started in the
+  // list restyles the pin (see SchoolMarker).
+  const [hovered, setHovered] = useState<{ id: string; from: 'list' | 'map' } | null>(null);
+  const handleHover = useCallback((u: University | null, from: 'list' | 'map') => {
+    setHovered(u ? { id: u.id, from } : null);
+  }, []);
 
   return (
     <div className={`map-page mobile-${mobileView}${presentation ? ' presentation' : ''}`}>
@@ -194,6 +215,23 @@ export default function MapView() {
       {error && <p className="form-error map-error">{error}</p>}
 
       <div className="map-body">
+        <SideList
+          universities={filtered}
+          selected={selected}
+          onSelect={(u) => {
+            setSelected(u);
+            setMobileView('map'); // on phones, jump to the map to show the school
+          }}
+          sort={sort}
+          onSortChange={setSort}
+          query={filters.q}
+          loading={loading}
+          totalCount={universities.length}
+          hoveredId={hovered?.id ?? null}
+          onHover={handleHover}
+          onClearFilters={() => setFilters(EMPTY_FILTERS)}
+        />
+
         <div className={`map-wrap${selected ? ' has-detail' : ''}`}>
           <MapContainer
             ref={setMap}
@@ -226,7 +264,9 @@ export default function MapView() {
                   key={u.id}
                   university={u}
                   selected={selected?.id === u.id}
+                  hovered={hovered?.from === 'list' && hovered.id === u.id}
                   onSelect={setSelected}
+                  onHover={handleHover}
                 />
               ))}
             </MarkerClusterGroup>
@@ -241,48 +281,12 @@ export default function MapView() {
             onPresentationToggle={togglePresentation}
           />
 
-          {loading && (
-            <div className="map-status" role="status">
-              <span className="map-spinner" aria-hidden />
-              Đang tải dữ liệu trường…
-            </div>
-          )}
-
-          {noneAtAll && (
-            <div className="map-status">Chưa có trường nào trong hệ thống.</div>
-          )}
-
-          {noneMatching && (
-            <div className="map-status">
-              {filters.q.trim()
-                ? `Không có ngành nào khớp “${filters.q.trim()}”.`
-                : 'Không có trường nào khớp bộ lọc.'}
-              <button
-                type="button"
-                className="btn btn-ghost"
-                onClick={() => setFilters(EMPTY_FILTERS)}
-              >
-                Xóa lọc
-              </button>
-            </div>
-          )}
 
           {selected && (
             <DetailDrawer university={selected} onClose={() => setSelected(null)} />
           )}
         </div>
 
-        <SideList
-          universities={filtered}
-          selected={selected}
-          onSelect={(u) => {
-            setSelected(u);
-            setMobileView('map'); // on phones, jump to the map to show the school
-          }}
-          sort={sort}
-          onSortChange={setSort}
-          query={filters.q}
-        />
       </div>
     </div>
   );
