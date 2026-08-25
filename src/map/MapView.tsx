@@ -215,23 +215,6 @@ export default function MapView() {
       {error && <p className="form-error map-error">{error}</p>}
 
       <div className="map-body">
-        <SideList
-          universities={filtered}
-          selected={selected}
-          onSelect={(u) => {
-            setSelected(u);
-            setMobileView('map'); // on phones, jump to the map to show the school
-          }}
-          sort={sort}
-          onSortChange={setSort}
-          query={filters.q}
-          loading={loading}
-          totalCount={universities.length}
-          hoveredId={hovered?.id ?? null}
-          onHover={handleHover}
-          onClearFilters={() => setFilters(EMPTY_FILTERS)}
-        />
-
         <div className={`map-wrap${selected ? ' has-detail' : ''}`}>
           <MapContainer
             ref={setMap}
@@ -286,6 +269,23 @@ export default function MapView() {
             <DetailDrawer university={selected} onClose={() => setSelected(null)} />
           )}
         </div>
+
+        <SideList
+          universities={filtered}
+          selected={selected}
+          onSelect={(u) => {
+            setSelected(u);
+            setMobileView('map'); // on phones, jump to the map to show the school
+          }}
+          sort={sort}
+          onSortChange={setSort}
+          query={filters.q}
+          loading={loading}
+          totalCount={universities.length}
+          hoveredId={hovered?.id ?? null}
+          onHover={handleHover}
+          onClearFilters={() => setFilters(EMPTY_FILTERS)}
+        />
 
       </div>
     </div>

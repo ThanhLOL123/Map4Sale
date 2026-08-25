@@ -309,8 +309,8 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 .filter-backdrop { display: none; }
 .map-error { padding: 0.5rem 1rem; }
 
-/* Docked results panel on the left, map filling the rest. SideList is rendered
-   before the map in MapView so DOM order matches what is on screen. */
+/* Map on the left, docked results panel on the right. SideList is rendered after
+   the map in MapView so DOM order matches what is on screen. */
 .map-body { flex: 1; min-height: 0; display: flex; }
 .map-wrap { position: relative; flex: 1; min-height: 0; min-width: 0; }
 /* The sea shows through wherever the province polygons don't reach; it is only
@@ -324,7 +324,7 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   flex-direction: column;
   min-height: 0;
   background: var(--surface);
-  border-right: 1px solid var(--border);
+  border-left: 1px solid var(--border);
 }
 
 /* In-screen Map/List switch — phones only (hidden on desktop). */
@@ -1088,7 +1088,7 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   }
   .map-page.mobile-map .side-list { display: none; }
   .map-page.mobile-list .map-wrap { display: none; }
-  .side-list { width: 100%; border-right: none; }
+  .side-list { width: 100%; border-left: none; }
 
   /* Stay top-right: the bottom-right corner belongs to the attribution, and
      the detail sheet (z-index 1000) correctly covers these when it opens. */
