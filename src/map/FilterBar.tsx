@@ -46,7 +46,7 @@ export default function FilterBar({ universities, filters, onChange, matchCount 
         <input
           type="search"
           className="filter-search"
-          placeholder="Tìm trường (tên, thành phố)…"
+          placeholder="Tìm theo ngành học…"
           value={filters.q}
           onChange={(e) => set({ q: e.target.value })}
         />

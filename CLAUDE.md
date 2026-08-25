@@ -36,6 +36,7 @@ Edge Functions are Deno, not part of the npm build. They deploy via `supabase fu
 - Geocoding uses Nominatim (restricted to `countrycodes=kr`).
 - `src/lib/useUniversityBrowser.ts` is the shared hook for the map and docked-list views: one fetch, shared filter + selection state.
 - `src/lib/filters.ts`: tuition is stored as free text; the max-tuition filter parses the *first number* in the string as million KRW per semester.
+- `src/lib/filters.ts` also owns search: the box matches `majors` **only** (not school names). `searchKey()` folds case, Vietnamese tone marks and đ→d; `scoreMajors()` requires every typed token to land inside one major and returns a rank (exact > prefix > phrase > any-order) that `SideList` orders by while the box has text in it.
 
 ### Activity tracking
 

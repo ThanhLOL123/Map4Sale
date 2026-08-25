@@ -52,16 +52,55 @@ export function parseTuitionMillions(tuition: string): number | null {
   return m ? parseFloat(m[1].replace(',', '.')) : null;
 }
 
+/**
+ * Fold text to a comparable key: lowercase, drop Vietnamese tone marks, đ → d.
+ * NFD splits the tones off as combining marks, but đ/Đ carry none and have to be
+ * replaced by hand. This is what lets staff type "quan tri" with no Vietnamese
+ * keyboard and still hit "Quản trị".
+ */
+export function searchKey(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * How well a school's majors answer the query. 0 means no match (filtered out);
+ * higher ranks first while the box has text in it.
+ *
+ * Every token has to land inside ONE major rather than being spread across
+ * several: "y khoa luật" matching a school because it teaches Y khoa and Luật
+ * separately would be noise, not an answer.
+ */
+export function scoreMajors(majors: string[], query: string): number {
+  const q = searchKey(query);
+  if (!q) return 0;
+  const tokens = q.split(' ');
+  let best = 0;
+  for (const major of majors) {
+    const key = searchKey(major);
+    let score = 0;
+    if (key === q) score = 4;                                  // the major itself
+    else if (key.startsWith(q)) score = 3;                     // prefix
+    else if (key.includes(q)) score = 2;                       // phrase inside it
+    else if (tokens.every((t) => key.includes(t))) score = 1;  // words, any order
+    if (score > best) best = score;
+  }
+  return best;
+}
+
 export function filterUniversities(
   universities: University[],
   f: UniversityFilters,
 ): University[] {
-  const q = f.q.trim().toLowerCase();
+  // The box searches majors only — school names are browsed in the list.
+  const q = f.q.trim();
   return universities.filter((u) => {
-    if (q) {
-      const haystack = `${u.name_vi} ${u.name_en} ${u.name_kr} ${u.city}`.toLowerCase();
-      if (!haystack.includes(q)) return false;
-    }
+    if (q && scoreMajors(u.majors, q) === 0) return false;
     if (f.region && u.region !== f.region) return false;
     if (f.major && !u.majors.includes(f.major)) return false;
     if (f.type && u.type !== f.type) return false;

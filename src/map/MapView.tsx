@@ -254,7 +254,9 @@ export default function MapView() {
 
           {noneMatching && (
             <div className="map-status">
-              Không có trường nào khớp bộ lọc.
+              {filters.q.trim()
+                ? `Không có ngành nào khớp “${filters.q.trim()}”.`
+                : 'Không có trường nào khớp bộ lọc.'}
               <button
                 type="button"
                 className="btn btn-ghost"
@@ -279,6 +281,7 @@ export default function MapView() {
           }}
           sort={sort}
           onSortChange={setSort}
+          query={filters.q}
         />
       </div>
     </div>
