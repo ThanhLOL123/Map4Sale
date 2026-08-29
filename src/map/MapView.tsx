@@ -3,7 +3,7 @@ import L, { type Map as LeafletMap } from 'leaflet';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import AppHeader from '../components/AppHeader';
-import { BASEMAPS, type Basemap } from './basemaps';
+import { MAX_ZOOM, SATELLITE, type Basemap } from './basemaps';
 import { EMPTY_FILTERS } from '../lib/filters';
 import { useFullscreen } from '../lib/useFullscreen';
 import { useUniversityBrowser } from '../lib/useUniversityBrowser';
@@ -13,6 +13,7 @@ import FilterBar from './FilterBar';
 import MapControls from './MapControls';
 import ProvinceLayer from './ProvinceLayer';
 import SideList, { type SortKey } from './SideList';
+import StreetBasemap from './StreetBasemap';
 import { createClusterIcon, createSchoolIcon } from './schoolIcon';
 import './leafletIcon';
 
@@ -148,7 +149,6 @@ export default function MapView() {
   const [mobileView, setMobileView] = useState<MobileView>('map');
   const [map, setMap] = useState<LeafletMap | null>(null);
   const [basemap, setBasemap] = useState<Basemap>('street');
-  const tiles = BASEMAPS[basemap];
 
   const [presentation, setPresentation] = useState(false);
   const { active: isFullscreen, request: requestFullscreen, exit: exitFullscreen } = useFullscreen();
@@ -221,19 +221,27 @@ export default function MapView() {
             center={KOREA_CENTER}
             zoom={KOREA_ZOOM}
             minZoom={6}
+            maxZoom={MAX_ZOOM}
             zoomControl={false} // replaced by <MapControls />
             className="leaflet-host"
           >
-            {/* Keyed on the basemap: react-leaflet cannot swap a tile layer's
-                url and tileSize in place, so the layer is remounted instead. */}
-            <TileLayer
-              key={basemap}
-              attribution={tiles.attribution}
-              url={tiles.url}
-              maxZoom={tiles.maxZoom}
-              tileSize={tiles.tileSize}
-              zoomOffset={tiles.zoomOffset}
-            />
+            {/* The two basemaps are different kinds of layer, not two URLs for
+                one: street is drawn by MapLibre from vector tiles so its labels
+                can be Latin, satellite is raster imagery. Either way switching
+                remounts — react-leaflet cannot swap a tile layer's url and
+                tileSize in place. */}
+            {basemap === 'satellite' ? (
+              <TileLayer
+                key="satellite"
+                attribution={SATELLITE.attribution}
+                url={SATELLITE.url}
+                maxZoom={SATELLITE.maxZoom}
+                tileSize={SATELLITE.tileSize}
+                zoomOffset={SATELLITE.zoomOffset}
+              />
+            ) : (
+              <StreetBasemap key="street" />
+            )}
             <ProvinceLayer />
             <MapController selected={selected} mobileView={mobileView} basemap={basemap} />
             <MarkerClusterGroup

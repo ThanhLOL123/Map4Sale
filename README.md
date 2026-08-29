@@ -78,11 +78,34 @@ so every screen is browsable. Admin edits are kept in memory only.
    `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Optionally set
    `VITE_MAPBOX_TOKEN` to a Mapbox public token to enable the satellite
    basemap toggle — without it the map has no satellite button and everything
-   else behaves normally.
+   else behaves normally. The street basemap needs no key of any kind; see
+   [The street basemap](#the-street-basemap) to change how it looks.
 
 6. **Load data**: sign in as the admin and add universities through
    *Quản trị → Trường đại học* (the sample dataset in
    `src/data/universities.sample.json` is a useful starting template).
+
+## The street basemap
+
+The map under the pins is drawn by [MapLibre GL](https://maplibre.org) from
+OpenStreetMap vector tiles served by [OpenFreeMap](https://openfreemap.org) —
+no API key, no rate limit — styled as CARTO Positron.
+
+It is vector rather than the more usual pre-rendered images for one reason:
+**labels**. Raster basemaps bake the text into the picture, so Korea arrives
+labelled in Hangul (서울, 부산) and nothing on the client can change that.
+Vector tiles ship the underlying data, so `src/map/latinLabels.ts` rewrites
+every label layer to read the Latin name before the first frame is drawn —
+Seoul, Busan, Daejeon. Nothing else in the map changed: MapLibre draws into
+Leaflet's own tile pane, under the province layer and the school pins.
+
+Point `VITE_BASEMAP_STYLE_URL` at any other MapLibre style to change the look
+(OpenFreeMap also serves `liberty`, `bright`, `dark` and `fiord`). The Latin
+rewrite is applied to whatever comes back.
+
+If the vector basemap cannot be shown — no WebGL on the device, or the style
+host unreachable — the map falls back to CARTO's raster tiles automatically.
+The labels are Korean again, but the map still works.
 
 ## Deployment (Vercel)
 
@@ -99,7 +122,7 @@ src/
   lib/        types, Supabase client, data layer (Supabase or demo), filters
   data/       bundled sample dataset (demo mode)
   auth/       AuthContext, login page, route guards
-  map/        map view, marker clustering, filter bar, detail drawer
+  map/        map view, MapLibre basemap, clustering, filter bar, detail drawer
   admin/      university CRUD + uploads, accounts, login logs, staff activity
 supabase/
   migrations/ schema + RLS + storage policies

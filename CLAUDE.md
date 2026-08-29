@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Map4Sale is an interactive map of South Korean universities for study-abroad sales consulting (a Vietnamese company). Sales staff click a marker to see the full school profile; admins manage universities, sale accounts, and login logs. Stack: React 18 + TypeScript + Vite, React-Leaflet (OpenStreetMap), Supabase (Postgres, Auth, Storage, Deno Edge Functions). Frontend deploys to Vercel.
+Map4Sale is an interactive map of South Korean universities for study-abroad sales consulting (a Vietnamese company). Sales staff click a marker to see the full school profile; admins manage universities, sale accounts, and login logs. Stack: React 18 + TypeScript + Vite, React-Leaflet with a MapLibre GL vector basemap (OpenStreetMap), Supabase (Postgres, Auth, Storage, Deno Edge Functions). Frontend deploys to Vercel.
 
 ## Commands
 
@@ -37,6 +37,36 @@ Edge Functions are Deno, not part of the npm build. They deploy via `supabase fu
 - `src/lib/useUniversityBrowser.ts` is the shared hook for the map and docked-list views: one fetch, shared filter + selection state.
 - `src/lib/filters.ts`: tuition is stored as free text; the max-tuition filter parses the *first number* in the string as million KRW per semester.
 - `src/lib/filters.ts` also owns search: the box matches `majors` **only** (not school names). `searchKey()` folds case, Vietnamese tone marks and đ→d; `scoreMajors()` requires every typed token to land inside one major and returns a rank (exact > prefix > phrase > any-order) that `SideList` orders by while the box has text in it.
+
+### The street basemap — vector, with Latin labels
+
+`src/map/StreetBasemap.tsx` draws the map under the pins with MapLibre GL from
+OpenFreeMap's vector tiles (OpenMapTiles schema, no API key), styled as CARTO
+Positron. It is vector for one reason: raster basemaps bake Hangul labels into
+the image, and this map is read by Vietnamese sales staff. `latinLabels.ts`
+rewrites every name-bearing `text-field` in the style to
+`coalesce(name:latin, name:en, name_int, name)` before MapLibre draws it —
+guard the rewrite with `rendersAName()`, since house numbers and road shields
+are symbol layers too.
+
+Three things to keep in mind when touching it:
+
+- The MapLibre canvas lives in Leaflet's **`tilePane`** (the bridge's default).
+  That is what keeps it under the province polygons and pins, and what lets the
+  `.provinces-solo .leaflet-tile-pane` cross-fade in `app.css` keep working.
+- MapLibre is **lazily imported** and must stay that way — it is ~1 MB, larger
+  than the rest of the app put together. The `import type` at the top of
+  `StreetBasemap.tsx` is erased at build time; a value import would not be.
+- Every failure falls back to the CARTO raster tiles in `RASTER_STREET`: no
+  WebGL, an unreachable style host, or a MapLibre map that never fires `load`
+  (a blank map is the one outcome worth avoiding). Attribution on the vector
+  layer goes through `attributionControl.customAttribution`, **not** Leaflet's
+  usual `attribution` option — the bridge overrides `getAttribution()` and
+  silently credits nobody otherwise.
+
+`MAX_ZOOM` is set on `<MapContainer>` rather than left to the layers, because
+Leaflet infers its zoom range from tile layers and the vector basemap is not
+one.
 
 ### Activity tracking
 

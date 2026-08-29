@@ -59,6 +59,10 @@ supabase functions deploy log-login
     button. Restrict the token to your domains in the Mapbox dashboard — it
     ships in the client bundle. Note that from Leaflet, Mapbox bills per **tile
     request**, not per map load, so watch usage in the first month.
+  - *(optional)* `VITE_BASEMAP_STYLE_URL` = a MapLibre style URL for the street
+    basemap. Omit it and the map uses OpenFreeMap's CARTO-Positron style, which
+    needs no key. Place labels are rewritten to Latin script whatever you point
+    it at, so the map never falls back to Hangul-only names.
 - **Redeploy** (Deployments → ⋯ → Redeploy). The app now runs live — the
   yellow **DEMO** badge disappears and login is required.
 

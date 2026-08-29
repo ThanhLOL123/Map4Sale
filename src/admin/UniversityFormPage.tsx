@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent } from 'react';
-import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, useMapEvents } from 'react-leaflet';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   deleteUniversityImage,
@@ -9,6 +9,8 @@ import {
   uploadUniversityImage,
 } from '../lib/api';
 import type { UniversityInput, UniversityType } from '../lib/types';
+import { MAX_ZOOM } from '../map/basemaps';
+import StreetBasemap from '../map/StreetBasemap';
 import '../map/leafletIcon';
 
 /** Lazy so TipTap stays out of the map bundle — sale accounts never load this. */
@@ -272,8 +274,17 @@ export default function UniversityFormPage() {
           {geoStatus && <span className="muted">{geoStatus}</span>}
         </div>
         <p className="muted">Hoặc click trực tiếp lên bản đồ để đặt tọa độ:</p>
-        <MapContainer center={markerPos} zoom={11} className="mini-map" key={form.id}>
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        {/* Same basemap as the sales map, for the same reason: an admin placing
+            a pin needs to recognise the district, and raw OSM tiles label
+            Korea in Hangul only. */}
+        <MapContainer
+          center={markerPos}
+          zoom={11}
+          maxZoom={MAX_ZOOM}
+          className="mini-map"
+          key={form.id}
+        >
+          <StreetBasemap />
           <CoordinatePicker onPick={(lat, lng) => setForm((f) => ({ ...f, lat, lng }))} />
           <Marker position={markerPos} />
         </MapContainer>
