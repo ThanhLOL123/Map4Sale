@@ -10,6 +10,18 @@
 
 const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
 
+/**
+ * CARTO began requiring a key for their basemaps: without one every tile comes
+ * back stamped "API KEY REQUIRED". The key is free (fair use, 5M tiles/month)
+ * from https://carto.com/basemaps/apikey and needs no CARTO account.
+ *
+ * Optional like the Mapbox token — with no key the map still works, it just
+ * carries CARTO's watermark, which is better than falling back to stock OSM
+ * raster: that renders Korean place names in Hangul, and the staff reading this
+ * map are Vietnamese.
+ */
+const cartoKey = import.meta.env.VITE_CARTO_API_KEY as string | undefined;
+
 /** False when VITE_MAPBOX_TOKEN is unset; the satellite toggle is then hidden. */
 export const satelliteAvailable = Boolean(mapboxToken);
 
@@ -32,7 +44,9 @@ export interface BasemapSpec {
 const KOSTAT_CREDIT = 'Ranh giới hành chính: <a href="https://kostat.go.kr">KOSTAT</a>';
 
 const STREET: BasemapSpec = {
-  url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+  url:
+    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png' +
+    (cartoKey ? `?key=${cartoKey}` : ''),
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors ' +
     `&copy; <a href="https://carto.com/attributions">CARTO</a> | ${KOSTAT_CREDIT}`,

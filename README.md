@@ -75,10 +75,14 @@ so every screen is browsable. Admin edits are kept in memory only.
    ```
 
 5. **Configure the frontend**: copy `.env.example` to `.env` and fill in
-   `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Optionally set
-   `VITE_MAPBOX_TOKEN` to a Mapbox public token to enable the satellite
-   basemap toggle — without it the map has no satellite button and everything
-   else behaves normally.
+   `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Two optional keys:
+   - `VITE_CARTO_API_KEY` — the street basemap comes from CARTO, which now
+     stamps "API KEY REQUIRED" across every tile unless a key is supplied. The
+     key is free (fair use, 5M tiles/month) and needs no CARTO account:
+     [carto.com/basemaps/apikey](https://carto.com/basemaps/apikey).
+   - `VITE_MAPBOX_TOKEN` — a Mapbox public token enabling the satellite basemap
+     toggle; without it the map has no satellite button and everything else
+     behaves normally.
 
 6. **Load data**: sign in as the admin and add universities through
    *Quản trị → Trường đại học* (the sample dataset in

@@ -54,6 +54,10 @@ supabase functions deploy log-login
 - In Vercel → your project → **Settings → Environment Variables**, add (Production):
   - `VITE_SUPABASE_URL` = the Project URL
   - `VITE_SUPABASE_ANON_KEY` = the anon public key
+  - `VITE_CARTO_API_KEY` = a CARTO Basemaps key. Without it the street map is
+    covered in "API KEY REQUIRED" watermarks. Free within CARTO's fair-use limit
+    (5M tiles/month — far above this app's usage) and no account is needed:
+    [carto.com/basemaps/apikey](https://carto.com/basemaps/apikey).
   - *(optional)* `VITE_MAPBOX_TOKEN` = a Mapbox public token (`pk.…`) to enable
     the satellite basemap toggle. Omit it and the map simply has no satellite
     button. Restrict the token to your domains in the Mapbox dashboard — it
