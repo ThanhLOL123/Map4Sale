@@ -17,6 +17,15 @@ import { createClusterIcon, createSchoolIcon } from './schoolIcon';
 import './leafletIcon';
 
 // South Korea, framed nation-wide
+/**
+ * Leaflet treats 3px of movement as a map drag and then suppresses the click
+ * that follows, so a press that wobbles — a trackpad, and every touchscreen —
+ * silently does nothing. 10px still starts a pan the moment one is intended.
+ */
+// Typed by hand: @types/leaflet does not surface `options` on the prototype.
+(L.Draggable.prototype as unknown as { options: { clickTolerance: number } })
+  .options.clickTolerance = 10;
+
 const KOREA_CENTER: [number, number] = [36.35, 127.8];
 const KOREA_ZOOM = 7;
 const HOME_VIEW = { center: KOREA_CENTER as L.LatLngExpression, zoom: KOREA_ZOOM };
@@ -107,14 +116,12 @@ function SchoolMarker({
   selected,
   hovered,
   onSelect,
-  onHover,
 }: {
   university: University;
   selected: boolean;
-  /** True only for a hover that started in the list — see the note below. */
+  /** Set while the pointer is over this school's row in the list. */
   hovered: boolean;
   onSelect: (u: University) => void;
-  onHover: (u: University | null, from: 'map') => void;
 }) {
   const icon = useMemo(
     () => createSchoolIcon(university, selected, hovered),
@@ -128,15 +135,13 @@ function SchoolMarker({
       // Leaflet derives each marker's z-index from latitude, so CSS alone
       // cannot lift the active pin above its neighbours.
       zIndexOffset={selected ? 1000 : 0}
-      eventHandlers={{
-        click: () => onSelect(university),
-        // Highlights the row in the list. It deliberately does NOT rebuild this
-        // icon: setIcon() swaps the DOM node out from under the pointer, which
-        // would fire mouseout and oscillate. The pin under the mouse is already
-        // brightened by the .school-pin:hover rule.
-        mouseover: () => onHover(university, 'map'),
-        mouseout: () => onHover(null, 'map'),
-      }}
+      // Only click. Marker mouseover/mouseout used to feed a hover state back to
+      // the list, but any pointer state change here re-renders the cluster and
+      // replaces this icon's DOM mid-press: mousedown then landed on the old
+      // node and mouseup on the new one, so the browser fired no click at all
+      // and the pin read as dead. The list → pin direction is safe and stays,
+      // because then the pointer is over the list, not over a marker.
+      eventHandlers={{ click: () => onSelect(university) }}
     />
   );
 }
@@ -176,13 +181,9 @@ export default function MapView() {
     return () => clearTimeout(t);
   }, [presentation, map]);
 
-  // Which school the pointer is over, and where the pointer is. `from` is what
-  // keeps the two directions from fighting: only a hover that started in the
-  // list restyles the pin (see SchoolMarker).
-  const [hovered, setHovered] = useState<{ id: string; from: 'list' | 'map' } | null>(null);
-  const handleHover = useCallback((u: University | null, from: 'list' | 'map') => {
-    setHovered(u ? { id: u.id, from } : null);
-  }, []);
+  // Which school the pointer is over in the results list; its pin is ringed.
+  const [hovered, setHovered] = useState<string | null>(null);
+  const handleHover = useCallback((u: University | null) => setHovered(u?.id ?? null), []);
 
   return (
     <div className={`map-page mobile-${mobileView}${presentation ? ' presentation' : ''}`}>
@@ -247,9 +248,8 @@ export default function MapView() {
                   key={u.id}
                   university={u}
                   selected={selected?.id === u.id}
-                  hovered={hovered?.from === 'list' && hovered.id === u.id}
+                  hovered={hovered === u.id}
                   onSelect={setSelected}
-                  onHover={handleHover}
                 />
               ))}
             </MarkerClusterGroup>
@@ -282,7 +282,7 @@ export default function MapView() {
           query={filters.q}
           loading={loading}
           totalCount={universities.length}
-          hoveredId={hovered?.id ?? null}
+          hoveredId={hovered}
           onHover={handleHover}
           onClearFilters={() => setFilters(EMPTY_FILTERS)}
         />

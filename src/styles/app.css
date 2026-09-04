@@ -445,6 +445,9 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 .school-pin-public .school-pin-head::after { border-top-color: var(--map-accent); }
 
 .school-pin-logo {
+  /* Pairs with draggable="false" in schoolIcon.ts — see the note there. */
+  -webkit-user-drag: none;
+  user-select: none;
   display: block;
   width: 100%;
   height: 100%;
@@ -462,6 +465,7 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 }
 
 .school-pin-label {
+  user-select: none;
   position: absolute;
   top: 100%;
   left: 50%;

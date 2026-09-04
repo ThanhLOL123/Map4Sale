@@ -46,7 +46,7 @@ interface Props {
   /** Schools before filtering — tells "database is empty" from "nothing matched". */
   totalCount: number;
   hoveredId: string | null;
-  onHover: (u: University | null, from: 'list') => void;
+  onHover: (u: University | null) => void;
   onClearFilters: () => void;
 }
 
@@ -102,10 +102,10 @@ export default function SideList({
                 }
                 onClick={() => onSelect(u)}
                 // Focus mirrors hover so keyboard users get the same pin highlight.
-                onMouseEnter={() => onHover(u, 'list')}
-                onMouseLeave={() => onHover(null, 'list')}
-                onFocus={() => onHover(u, 'list')}
-                onBlur={() => onHover(null, 'list')}
+                onMouseEnter={() => onHover(u)}
+                onMouseLeave={() => onHover(null)}
+                onFocus={() => onHover(u)}
+                onBlur={() => onHover(null)}
               >
                 {u.logo_url ? (
                   <img src={u.logo_url} alt="" className="uni-row-logo" />

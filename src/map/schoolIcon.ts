@@ -23,7 +23,11 @@ function escapeHtml(value: string): string {
 
 function headHtml(u: University): string {
   if (u.logo_url) {
-    return `<img class="school-pin-logo" src="${escapeHtml(u.logo_url)}" alt="">`;
+    // draggable="false" is load-bearing: an <img> is natively draggable, so
+    // pressing a pin and moving even a couple of pixels — a trackpad or a
+    // touchscreen almost guarantees it — starts an image drag and the browser
+    // never fires the click. The pin then looks simply dead.
+    return `<img class="school-pin-logo" src="${escapeHtml(u.logo_url)}" alt="" draggable="false">`;
   }
   const initial = escapeHtml(u.name_en.slice(0, 1) || u.name_vi.slice(0, 1));
   return `<span class="school-pin-logo school-pin-logo-placeholder">${initial}</span>`;
