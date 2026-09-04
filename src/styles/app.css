@@ -480,7 +480,12 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  pointer-events: none; /* never let a label steal a neighbouring pin's click */
+  /* Clickable: the name is the obvious thing to press, and it used to be inert.
+     Leaflet z-orders markers by screen y and a label hangs below its own head,
+     so any pin a label overlaps is further south, gets a higher z-index, and
+     paints above it — a contested click still goes to the pin, not the label. */
+  pointer-events: auto;
+  cursor: pointer;
 }
 /* Names would collide at low zoom; MapController toggles this class. */
 .leaflet-host:not(.pins-labeled) .school-pin-label { display: none; }
