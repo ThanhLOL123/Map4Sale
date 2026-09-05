@@ -19,6 +19,7 @@ interface AuthState {
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  changePassword: (current: string, next: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -121,6 +122,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(isDemoMode ? DEMO_ADMIN : null);
   }, []);
 
+  /**
+   * Change one's own password. Runs entirely in the browser on the user's own
+   * session — no service-role key is involved, so this needs no Edge Function.
+   *
+   * `updateUser` never asks for the old password, so we prove it first by
+   * signing in again. A wrong password fails that call *without* clearing the
+   * stored session, so the user simply stays where they were. A correct one
+   * emits SIGNED_IN, which the listener above ignores, and cannot double-log
+   * the arrival because `logAccess` is guarded by the module-level flag.
+   */
+  const changePassword = useCallback(
+    async (current: string, next: string) => {
+      if (isDemoMode) return; // demo has no auth; the dialog stays browsable
+      const supa = requireSupabase();
+      const email = profile?.email;
+      if (!email) throw new Error('Phiên đăng nhập đã hết hạn. Đăng nhập lại.');
+
+      const { error: authError } = await supa.auth.signInWithPassword({
+        email,
+        password: current,
+      });
+      if (authError) throw new Error('Mật khẩu hiện tại không đúng.');
+
+      // Surface the server's own text: a rejection here is almost always the
+      // project's password policy, and its wording says which rule was missed.
+      const { error } = await supa.auth.updateUser({ password: next });
+      if (error) throw new Error(error.message);
+    },
+    [profile?.email],
+  );
+
   const value = useMemo<AuthState>(
     () => ({
       profile,
@@ -128,8 +160,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAdmin: profile?.role === 'admin',
       signIn,
       signOut,
+      changePassword,
     }),
-    [profile, loading, signIn, signOut],
+    [profile, loading, signIn, signOut, changePassword],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

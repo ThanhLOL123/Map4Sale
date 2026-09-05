@@ -1,4 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
+import ChangePasswordButton from '../components/ChangePasswordButton';
 import { isDemoMode } from '../lib/supabase';
 
 export default function AdminLayout() {
@@ -9,6 +10,7 @@ export default function AdminLayout() {
         {isDemoMode && <span className="badge badge-demo">DEMO</span>}
         <div className="app-header-right">
           <Link to="/" className="btn btn-ghost">← Về bản đồ</Link>
+          <ChangePasswordButton />
         </div>
       </header>
 

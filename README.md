@@ -20,6 +20,8 @@ to **Vercel**; everything fits in the free tiers.
   school type, max tuition and ranking. Results are listed in a docked panel
   beside the map; hovering a result highlights that school's pin (and back)
 - 🔐 Email/password login (Supabase Auth) with `admin` / `sale` roles and RLS
+- 🔑 **Đổi mật khẩu** in the header on every screen — a signed-in user replaces
+  the random password the admin handed over, after confirming the current one
 - 🛠️ Admin panel: university CRUD (coordinates by map click or Nominatim geocoding),
   logo & photo uploads to Supabase Storage, sales-account management
   (create / disable / re-enable / password reset), login log dashboard

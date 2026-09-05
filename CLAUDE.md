@@ -64,6 +64,8 @@ Two roles: `admin` and `sale` (in `public.profiles`, auto-created by a trigger o
 - `activity_events`: an active user inserts *only their own* rows, admin read only, no update/delete policy at all — `user_id` and `occurred_at` are stamped by a `before insert` trigger, so neither can be forged.
 - Storage: public read; admin-only write.
 
+`AuthContext` also exposes `changePassword()`, used by the header's **Đổi mật khẩu** dialog. It is deliberately client-side — a user updating their *own* password needs no service-role key, so there is no Edge Function. Supabase's `updateUser` never asks for the old password, so it re-runs `signInWithPassword` first to prove it; a failed one leaves the existing session intact.
+
 Deactivated accounts (`is_active = false`) are signed out client-side by `AuthContext` and blocked from data by the `is_active_user()` RLS helper. Routes: `/` (map) requires login; `/admin/*` requires admin — both enforced by `ProtectedRoute` in `src/App.tsx`.
 
 ### Database migrations — dual maintenance

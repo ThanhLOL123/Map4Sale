@@ -157,6 +157,9 @@ Once steps 1–5 are done, confirm the live system end-to-end:
 - [ ] **Create a sale account** → the invite email arrives (see step 6).
 - [ ] Log in as that sale user → a row appears in **Quản trị → Nhật ký đăng nhập**
       with city/country (real IP; localhost shows blank — that's expected).
+- [ ] As that sale user, **Đổi mật khẩu** in the header: a wrong current password
+      is rejected without logging them out, a correct change succeeds, and the
+      new password works on the next sign-in.
 - [ ] **Quản trị → Sao lưu → Tải bản sao lưu** downloads a `.json` of live data.
 - [ ] As that sale user, open a few schools and run a search; then in
       **Quản trị → Hoạt động nhân viên** (7 ngày) their row shows a recent

@@ -4,6 +4,12 @@ interface Props {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  /**
+   * 'full' is the 80% sub-screen this was built for. 'compact' shrinks the
+   * panel to its content for a short dialog (the password form), reusing the
+   * backdrop, focus handling and Escape rather than growing a second modal.
+   */
+  size?: 'full' | 'compact';
 }
 
 /**
@@ -18,7 +24,7 @@ interface Props {
  * there will close this overlay *and* drop out of presentation. The X button is
  * the reliable close while presenting.
  */
-export default function ExpandOverlay({ title, onClose, children }: Props) {
+export default function ExpandOverlay({ title, onClose, children, size = 'full' }: Props) {
   const closeRef = useRef<HTMLButtonElement>(null);
   // Whatever had focus when we opened, so it can be handed back on close.
   const returnTo = useRef<HTMLElement | null>(null);
@@ -50,7 +56,7 @@ export default function ExpandOverlay({ title, onClose, children }: Props) {
   return (
     <div className="expand-backdrop" onClick={onClose}>
       <div
-        className="expand-panel"
+        className={`expand-panel${size === 'compact' ? ' expand-panel-compact' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-label={title}

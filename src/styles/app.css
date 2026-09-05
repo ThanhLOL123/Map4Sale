@@ -833,6 +833,28 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
   flex-direction: column;
   overflow: hidden;
 }
+/* A short dialog (the password form) sizes to its content instead of taking
+   over the screen; everything else about the overlay is shared. */
+.expand-panel-compact {
+  width: min(420px, 92vw);
+  height: auto;
+  max-height: 92vh;
+}
+
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+/* The global `label` rule already stacks the caption above its input, which is
+   what this form wants — no override needed here (cf. .filter-check). */
+.password-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
 /* Close sits at the top LEFT, as requested, so the title follows it. */
 .expand-head {
   display: flex;
@@ -864,7 +886,7 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 .expand-body .rich-text-full table { width: 100%; }
 
 @media (max-width: 768px) {
-  .expand-panel { width: 94vw; height: 88vh; }
+  .expand-panel:not(.expand-panel-compact) { width: 94vw; height: 88vh; }
 }
 
 /* ---------- presentation mode ---------- */
