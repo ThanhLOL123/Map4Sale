@@ -76,7 +76,9 @@ export default function RichText({
 
   return (
     <>
-      <div className="rich-text-clamp" ref={bodyRef}>
+      {/* The fade is painted only once the content really is cut off — on a
+          short field it would just wash the last line out. */}
+      <div className={`rich-text-clamp${overflowing ? ' rich-text-clamped' : ''}`} ref={bodyRef}>
         {body()}
       </div>
       {overflowing && (
