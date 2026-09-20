@@ -799,26 +799,10 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
    that opens it in a sub-screen. RichText only renders the button once it has
    measured real overflow, so short content is untouched. */
 
+/* No fade over the cut edge: a gradient washes out the last visible row, and a
+   half-faded table row reads as a rendering fault rather than as "there is
+   more". The cut is clean and "Xem toàn bộ" is what says the rest exists. */
 .rich-text-clamp { max-height: 320px; overflow: hidden; position: relative; }
-/* Fade the cut edge so it reads as "there is more", not as a rendering bug.
-   Only on .rich-text-clamped — content that actually overflows. */
-.rich-text-clamped::after {
-  content: '';
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 42px;
-  background: linear-gradient(to bottom, transparent, var(--surface));
-  pointer-events: none;
-}
-/* Inside the two warning-coloured boxes the fade has to end in their colour,
-   not the drawer surface, or the cut edge reads as a rendering fault. The
-   selectors differ because the boxes attach at different levels: .important-notes
-   wraps the RichText, while .sale-notes is RichText's own class and so lands
-   inside the clamp. */
-.important-notes .rich-text-clamped::after,
-.rich-text-clamped:has(.sale-notes)::after {
-  background: linear-gradient(to bottom, transparent, var(--warning-bg));
-}
 .rich-text-expand {
   margin-top: 0.4rem;
   padding: 0.35rem 0.8rem;
