@@ -1,13 +1,19 @@
 :root {
   --brand: #1d4ed8;
   --brand-dark: #1e40af;
-  /* The green accent: primary buttons and rich-text table headers. Kept apart
-     from --brand so links, focus rings, map pins, the selected-row border and
-     the editor's own chrome stay blue. Text on it is near-black because white
-     on #66FF66 is 1.3:1, unreadable — dark green on it is 11.3:1. */
+  /* Primary buttons. Kept apart from --brand so links, focus rings, map pins,
+     the selected-row border and the editor's own chrome stay blue. Text on it
+     is near-black because white on #66ff66 is 1.3:1, unreadable. */
   --brand-green: #66ff66;
   --brand-green-dark: #53d153;
   --brand-green-text: #0f2e14;
+  /* Rich-text tables: a soft green scheme, flat, with the accent carried by
+     the header band and the category column's left rail. */
+  --table-accent: #43a047;
+  --table-cat-bg: #e8f5e9;
+  --table-cat-text: #1b5e20;
+  --table-cell-border: #e0e0e0;
+  --table-cell-text: #1f2937;
   --bg: #f5f7fb;
   --surface: #ffffff;
   --text: #1f2937;
@@ -892,7 +898,7 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 /* Inside the sub-screen there is room to breathe. */
 .expand-body .rich-text-full { font-size: 1.05rem; }
 .expand-body .rich-text-full th,
-.expand-body .rich-text-full td { padding: 0.45rem 0.7rem; }
+.expand-body .rich-text-full td { padding: 12px 16px; }
 /* There is room in the sub-screen, so let the table use the full width the
    way the printed brochure does. */
 .expand-body .rich-text-full table { width: 100%; }
@@ -928,7 +934,7 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 /* Tuition tables are read across a room, not at arm's length. */
 .map-page.presentation .rich-text table { font-size: 1em; }
 .map-page.presentation .rich-text th,
-.map-page.presentation .rich-text td { padding: 0.5rem 0.8rem; }
+.map-page.presentation .rich-text td { padding: 14px 18px; }
 .map-page.presentation .gallery img { height: 150px; }
 
 /* List: still there for jumping between schools, just bigger and calmer. */
@@ -1017,24 +1023,43 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
 }
 .rich-text th, .rich-text td,
 .rte-content th, .rte-content td {
-  border: 1px solid var(--border);
-  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--table-cell-border);
+  padding: 10px 12px;
   vertical-align: top;
   min-width: 3rem;
 }
-/* Brochure styling: header row and header column in the brand blue, matching
-   the client's "GIỚI THIỆU KHOA – CHUYÊN NGÀNH" layout. Header cells created
-   by toggleHeaderColumn get the same treatment, which is what makes a merged
-   faculty label read as a group heading. */
+.rich-text td,
+.rte-content td {
+  background: var(--surface);
+  color: var(--table-cell-text);
+}
+/* Brochure styling, matching the client's "GIỚI THIỆU KHOA – CHUYÊN NGÀNH"
+   layout. Header cells created by toggleHeaderColumn get this too, which is
+   what makes a merged faculty label read as a group heading. */
 .rich-text th,
 .rte-content th {
-  background: var(--brand-green);
-  color: var(--brand-green-text);
-  font-weight: 600;
+  background: var(--table-cat-bg);
+  color: var(--table-cat-text);
+  font-weight: 500;
   text-align: left;
-  /* The old white gridlines were drawn for a dark blue fill; on a light green
-     one they disappear, so the separators go dark instead. */
-  border-color: #0f2e1459;
+  border-radius: 0;
+}
+/* The category column carries the accent rail. Scoped to the first cell so a
+   header row's remaining cells are not sliced up by green verticals. */
+.rich-text th:first-child,
+.rte-content th:first-child {
+  border-left: 4px solid var(--table-accent);
+}
+/* Row one is the header row: the accent as a solid band. Its rail matches, so
+   the band reads as one block rather than a rail plus a header. */
+.rich-text tr:first-child th,
+.rte-content tr:first-child th {
+  background: var(--table-accent);
+  color: #fff;
+}
+.rich-text tr:first-child th:first-child,
+.rte-content tr:first-child th:first-child {
+  border-left-color: var(--table-accent);
 }
 /* Cells hold block content, so kill the paragraph margins inside them. */
 .rich-text td > p, .rich-text th > p,
