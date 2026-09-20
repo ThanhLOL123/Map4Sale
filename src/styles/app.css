@@ -1,12 +1,13 @@
 :root {
   --brand: #1d4ed8;
   --brand-dark: #1e40af;
-  /* Primary buttons are green, separate from --brand so links, focus rings,
-     map pins and the selected-row border stay blue. The label is near-black:
-     white on #66FF66 is 1.3:1, unreadable — dark green on it is 11.3:1. */
-  --btn-primary: #66ff66;
-  --btn-primary-dark: #53d153;
-  --btn-primary-text: #0f2e14;
+  /* The green accent: primary buttons and rich-text table headers. Kept apart
+     from --brand so links, focus rings, map pins, the selected-row border and
+     the editor's own chrome stay blue. Text on it is near-black because white
+     on #66FF66 is 1.3:1, unreadable — dark green on it is 11.3:1. */
+  --brand-green: #66ff66;
+  --brand-green-dark: #53d153;
+  --brand-green-text: #0f2e14;
   --bg: #f5f7fb;
   --surface: #ffffff;
   --text: #1f2937;
@@ -62,15 +63,15 @@ a { color: var(--brand); }
 }
 .btn:hover { border-color: var(--brand); color: var(--brand); }
 .btn-primary {
-  background: var(--btn-primary);
-  border-color: var(--btn-primary-dark);
-  color: var(--btn-primary-text);
+  background: var(--brand-green);
+  border-color: var(--brand-green-dark);
+  color: var(--brand-green-text);
   font-weight: 600;
 }
 .btn-primary:hover {
-  background: var(--btn-primary-dark);
-  border-color: var(--btn-primary-dark);
-  color: var(--btn-primary-text);
+  background: var(--brand-green-dark);
+  border-color: var(--brand-green-dark);
+  color: var(--brand-green-text);
 }
 .btn-primary:disabled { opacity: 0.6; cursor: default; }
 .btn-ghost { border-color: transparent; background: transparent; }
@@ -1027,11 +1028,13 @@ label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.88rem;
    faculty label read as a group heading. */
 .rich-text th,
 .rte-content th {
-  background: var(--brand);
-  color: #fff;
+  background: var(--brand-green);
+  color: var(--brand-green-text);
   font-weight: 600;
   text-align: left;
-  border-color: #ffffff59;
+  /* The old white gridlines were drawn for a dark blue fill; on a light green
+     one they disappear, so the separators go dark instead. */
+  border-color: #0f2e1459;
 }
 /* Cells hold block content, so kill the paragraph margins inside them. */
 .rich-text td > p, .rich-text th > p,
