@@ -1,6 +1,7 @@
 [
   {
     "id": "d1000000-0000-4000-8000-000000000001",
+    "country": "kr",
     "name_kr": "서울대학교",
     "name_en": "Seoul National University",
     "name_vi": "Đại học Quốc gia Seoul",
@@ -43,6 +44,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000002",
+    "country": "kr",
     "name_kr": "카이스트",
     "name_en": "KAIST",
     "name_vi": "Viện KH&CN tiên tiến Hàn Quốc (KAIST)",
@@ -81,6 +83,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000003",
+    "country": "kr",
     "name_kr": "연세대학교",
     "name_en": "Yonsei University",
     "name_vi": "Đại học Yonsei",
@@ -122,6 +125,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000004",
+    "country": "kr",
     "name_kr": "고려대학교",
     "name_en": "Korea University",
     "name_vi": "Đại học Korea",
@@ -162,6 +166,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000005",
+    "country": "kr",
     "name_kr": "포항공과대학교",
     "name_en": "POSTECH",
     "name_vi": "Đại học KH&CN Pohang (POSTECH)",
@@ -200,6 +205,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000006",
+    "country": "kr",
     "name_kr": "성균관대학교",
     "name_en": "Sungkyunkwan University",
     "name_vi": "Đại học Sungkyunkwan (SKKU)",
@@ -238,6 +244,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000007",
+    "country": "kr",
     "name_kr": "한양대학교",
     "name_en": "Hanyang University",
     "name_vi": "Đại học Hanyang",
@@ -277,6 +284,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000008",
+    "country": "kr",
     "name_kr": "경희대학교",
     "name_en": "Kyung Hee University",
     "name_vi": "Đại học Kyung Hee",
@@ -315,6 +323,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000009",
+    "country": "kr",
     "name_kr": "이화여자대학교",
     "name_en": "Ewha Womans University",
     "name_vi": "Đại học nữ Ewha",
@@ -353,6 +362,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000010",
+    "country": "kr",
     "name_kr": "서강대학교",
     "name_en": "Sogang University",
     "name_vi": "Đại học Sogang",
@@ -391,6 +401,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000011",
+    "country": "kr",
     "name_kr": "중앙대학교",
     "name_en": "Chung-Ang University",
     "name_vi": "Đại học Chung-Ang",
@@ -429,6 +440,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000012",
+    "country": "kr",
     "name_kr": "건국대학교",
     "name_en": "Konkuk University",
     "name_vi": "Đại học Konkuk",
@@ -467,6 +479,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000013",
+    "country": "kr",
     "name_kr": "동국대학교",
     "name_en": "Dongguk University",
     "name_vi": "Đại học Dongguk",
@@ -505,6 +518,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000014",
+    "country": "kr",
     "name_kr": "홍익대학교",
     "name_en": "Hongik University",
     "name_vi": "Đại học Hongik",
@@ -542,6 +556,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000015",
+    "country": "kr",
     "name_kr": "세종대학교",
     "name_en": "Sejong University",
     "name_vi": "Đại học Sejong",
@@ -579,6 +594,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000016",
+    "country": "kr",
     "name_kr": "숭실대학교",
     "name_en": "Soongsil University",
     "name_vi": "Đại học Soongsil",
@@ -617,6 +633,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000017",
+    "country": "kr",
     "name_kr": "인하대학교",
     "name_en": "Inha University",
     "name_vi": "Đại học Inha",
@@ -654,6 +671,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000018",
+    "country": "kr",
     "name_kr": "아주대학교",
     "name_en": "Ajou University",
     "name_vi": "Đại học Ajou",
@@ -691,6 +709,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000019",
+    "country": "kr",
     "name_kr": "가천대학교",
     "name_en": "Gachon University",
     "name_vi": "Đại học Gachon",
@@ -729,6 +748,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000020",
+    "country": "kr",
     "name_kr": "부산대학교",
     "name_en": "Pusan National University",
     "name_vi": "Đại học Quốc gia Pusan",
@@ -766,6 +786,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000021",
+    "country": "kr",
     "name_kr": "경북대학교",
     "name_en": "Kyungpook National University",
     "name_vi": "Đại học Quốc gia Kyungpook",
@@ -803,6 +824,7 @@
   },
   {
     "id": "d1000000-0000-4000-8000-000000000022",
+    "country": "kr",
     "name_kr": "전남대학교",
     "name_en": "Chonnam National University",
     "name_vi": "Đại học Quốc gia Chonnam",
@@ -837,6 +859,309 @@
     "important_notes": "Thuộc nhóm trường ưu tiên visa thẳng — hồ sơ dễ đậu nhưng phải chuẩn bị tài chính đúng chuẩn. Gwangju xa Seoul.",
     "sale_notes": "Chi phí tổng thấp nhất danh sách. Visa thẳng (trường ưu tiên) — hồ sơ dễ đậu. Phù hợp HS cần tiết kiệm tối đa.",
     "updated_at": "2026-07-01T00:00:00Z",
+    "majors_detail": ""
+  },
+  {
+    "id": "d2000000-0000-4000-8000-000000000001",
+    "country": "tw",
+    "name_kr": "國立臺灣大學",
+    "name_en": "National Taiwan University",
+    "name_vi": "Đại học Quốc gia Đài Loan (NTU)",
+    "logo_url": "/samples/logo-1.svg",
+    "image_urls": [
+      "/samples/campus-1.svg",
+      "/samples/campus-2.svg"
+    ],
+    "video_urls": [],
+    "lat": 25.0173,
+    "lng": 121.5398,
+    "city": "Taipei",
+    "region": "Taipei",
+    "type": "public",
+    "ranking": 1,
+    "is_featured": true,
+    "majors": [
+      "Kỹ thuật máy tính",
+      "Kỹ thuật điện",
+      "Kinh doanh",
+      "Kinh tế",
+      "Y khoa",
+      "Nông nghiệp"
+    ],
+    "tuition": "55.000–65.000 TWD/kỳ tuỳ khoa (Kỹ thuật, Y cao hơn KHXH)",
+    "scholarship": "Học bổng Chính phủ Đài Loan (Taiwan Scholarship) và học bổng riêng của trường cho SV quốc tế; mức và điều kiện thay đổi theo từng năm.",
+    "topik_req": "Chương trình tiếng Trung: TOCFL cấp 4 (B2) trở lên",
+    "ielts_req": "Chương trình tiếng Anh: IELTS 6.5+",
+    "gpa_req": "GPA 8.5+/10",
+    "dorm_info": "KTX trong trường cho SV quốc tế năm nhất, khoảng 10.000–20.000 TWD/kỳ.",
+    "living_cost": "Khoảng 12.000–18.000 TWD/tháng tại Đài Bắc (chưa gồm học phí).",
+    "important_notes": "Trường top đầu, cạnh tranh cao; hồ sơ quốc tế thường nộp từ tháng 12 đến tháng 3.",
+    "sale_notes": "Dành cho HS giỏi; nhấn mạnh thương hiệu số 1 Đài Loan.",
+    "updated_at": "2026-09-01T00:00:00Z",
+    "majors_detail": "<table><tbody><tr><th>Khoa</th><th>Chuyên ngành</th></tr><tr><th>Kỹ thuật điện – Khoa học máy tính</th><td><p>Kỹ thuật điện</p><p>Khoa học máy tính</p></td></tr><tr><th>Quản trị</th><td><p>Quản trị kinh doanh</p><p>Tài chính</p></td></tr><tr><th>Khoa học xã hội</th><td><p>Kinh tế</p><p>Khoa học chính trị</p></td></tr></tbody></table>"
+  },
+  {
+    "id": "d2000000-0000-4000-8000-000000000002",
+    "country": "tw",
+    "name_kr": "國立清華大學",
+    "name_en": "National Tsing Hua University",
+    "name_vi": "Đại học Thanh Hoa Quốc gia (NTHU)",
+    "logo_url": "/samples/logo-2.svg",
+    "image_urls": [
+      "/samples/campus-2.svg",
+      "/samples/campus-3.svg"
+    ],
+    "video_urls": [],
+    "lat": 24.7961,
+    "lng": 120.9967,
+    "city": "Hsinchu",
+    "region": "Hsinchu",
+    "type": "public",
+    "ranking": 2,
+    "is_featured": true,
+    "majors": [
+      "Kỹ thuật bán dẫn",
+      "Kỹ thuật điện",
+      "Kỹ thuật máy tính",
+      "Vật lý",
+      "Khoa học vật liệu"
+    ],
+    "tuition": "55.000–62.000 TWD/kỳ",
+    "scholarship": "Học bổng Chính phủ Đài Loan (Taiwan Scholarship) và học bổng riêng của trường cho SV quốc tế; mức và điều kiện thay đổi theo từng năm.",
+    "topik_req": "Chương trình tiếng Trung: TOCFL cấp 4 (B2)",
+    "ielts_req": "IELTS 6.0+ cho chương trình tiếng Anh",
+    "gpa_req": "GPA 8.0+/10, mạnh Toán – Lý",
+    "dorm_info": "KTX trong trường, ưu tiên SV quốc tế năm đầu.",
+    "living_cost": "Khoảng 10.000–15.000 TWD/tháng tại Tân Trúc.",
+    "important_notes": "Nằm cạnh Khu công nghệ Tân Trúc — lợi thế thực tập ngành bán dẫn.",
+    "sale_notes": "Phù hợp HS khối tự nhiên muốn theo ngành bán dẫn, vi mạch.",
+    "updated_at": "2026-09-01T00:00:00Z",
+    "majors_detail": ""
+  },
+  {
+    "id": "d2000000-0000-4000-8000-000000000003",
+    "country": "tw",
+    "name_kr": "國立成功大學",
+    "name_en": "National Cheng Kung University",
+    "name_vi": "Đại học Thành Công Quốc gia (NCKU)",
+    "logo_url": "/samples/logo-3.svg",
+    "image_urls": [
+      "/samples/campus-3.svg",
+      "/samples/campus-4.svg"
+    ],
+    "video_urls": [],
+    "lat": 22.9969,
+    "lng": 120.2196,
+    "city": "Tainan",
+    "region": "Tainan",
+    "type": "public",
+    "ranking": 3,
+    "is_featured": false,
+    "majors": [
+      "Kỹ thuật cơ khí",
+      "Kỹ thuật xây dựng",
+      "Kỹ thuật điện",
+      "Kinh doanh",
+      "Y khoa"
+    ],
+    "tuition": "52.000–60.000 TWD/kỳ",
+    "scholarship": "Học bổng Chính phủ Đài Loan (Taiwan Scholarship) và học bổng riêng của trường cho SV quốc tế; mức và điều kiện thay đổi theo từng năm.",
+    "topik_req": "TOCFL cấp 3–4 tuỳ chương trình",
+    "ielts_req": "IELTS 6.0+",
+    "gpa_req": "GPA 8.0+/10",
+    "dorm_info": "KTX trong trường, giá mềm hơn khu vực phía Bắc.",
+    "living_cost": "Khoảng 9.000–13.000 TWD/tháng tại Đài Nam.",
+    "important_notes": "Thế mạnh kỹ thuật; chi phí sinh hoạt ở miền Nam thấp hơn Đài Bắc.",
+    "sale_notes": "Gợi ý cho HS muốn trường top nhưng chi phí dễ chịu.",
+    "updated_at": "2026-09-01T00:00:00Z",
+    "majors_detail": ""
+  },
+  {
+    "id": "d2000000-0000-4000-8000-000000000004",
+    "country": "tw",
+    "name_kr": "國立政治大學",
+    "name_en": "National Chengchi University",
+    "name_vi": "Đại học Chính trị Quốc gia (NCCU)",
+    "logo_url": "/samples/logo-4.svg",
+    "image_urls": [
+      "/samples/campus-4.svg",
+      "/samples/campus-1.svg"
+    ],
+    "video_urls": [],
+    "lat": 24.9868,
+    "lng": 121.5765,
+    "city": "Taipei",
+    "region": "Taipei",
+    "type": "public",
+    "ranking": 6,
+    "is_featured": false,
+    "majors": [
+      "Kinh doanh",
+      "Quan hệ quốc tế",
+      "Truyền thông",
+      "Luật",
+      "Kinh tế"
+    ],
+    "tuition": "50.000–56.000 TWD/kỳ",
+    "scholarship": "Học bổng Chính phủ Đài Loan (Taiwan Scholarship) và học bổng riêng của trường cho SV quốc tế; mức và điều kiện thay đổi theo từng năm.",
+    "topik_req": "TOCFL cấp 4 (B2) cho chương trình tiếng Trung",
+    "ielts_req": "IELTS 6.0+",
+    "gpa_req": "GPA 8.0+/10",
+    "dorm_info": "KTX trong trường, số chỗ có hạn.",
+    "living_cost": "Khoảng 12.000–18.000 TWD/tháng tại Đài Bắc (chưa gồm học phí).",
+    "important_notes": "Mạnh khối kinh tế – xã hội – truyền thông.",
+    "sale_notes": "Phù hợp HS khối xã hội, định hướng kinh doanh quốc tế.",
+    "updated_at": "2026-09-01T00:00:00Z",
+    "majors_detail": ""
+  },
+  {
+    "id": "d2000000-0000-4000-8000-000000000005",
+    "country": "tw",
+    "name_kr": "國立臺灣師範大學",
+    "name_en": "National Taiwan Normal University",
+    "name_vi": "Đại học Sư phạm Quốc gia Đài Loan (NTNU)",
+    "logo_url": "/samples/logo-1.svg",
+    "image_urls": [
+      "/samples/campus-1.svg",
+      "/samples/campus-2.svg"
+    ],
+    "video_urls": [],
+    "lat": 25.0265,
+    "lng": 121.5276,
+    "city": "Taipei",
+    "region": "Taipei",
+    "type": "public",
+    "ranking": 5,
+    "is_featured": true,
+    "majors": [
+      "Hoa ngữ",
+      "Giáo dục",
+      "Ngôn ngữ Anh",
+      "Thiết kế",
+      "Âm nhạc"
+    ],
+    "tuition": "48.000–55.000 TWD/kỳ; khoá tiếng Hoa tính riêng theo quý",
+    "scholarship": "Học bổng Chính phủ Đài Loan (Taiwan Scholarship) và học bổng riêng của trường cho SV quốc tế; mức và điều kiện thay đổi theo từng năm.",
+    "topik_req": "Có trung tâm tiếng Hoa cho người chưa có TOCFL",
+    "ielts_req": "IELTS 5.5+ cho một số chương trình",
+    "gpa_req": "GPA 7.5+/10",
+    "dorm_info": "KTX trong trường, cần đăng ký sớm.",
+    "living_cost": "Khoảng 12.000–18.000 TWD/tháng tại Đài Bắc (chưa gồm học phí).",
+    "important_notes": "Trung tâm tiếng Hoa nổi tiếng — lộ trình học tiếng trước rồi vào chuyên ngành.",
+    "sale_notes": "Điểm vào tốt cho HS chưa có tiếng Trung.",
+    "updated_at": "2026-09-01T00:00:00Z",
+    "majors_detail": ""
+  },
+  {
+    "id": "d2000000-0000-4000-8000-000000000006",
+    "country": "tw",
+    "name_kr": "國立中山大學",
+    "name_en": "National Sun Yat-sen University",
+    "name_vi": "Đại học Trung Sơn Quốc gia (NSYSU)",
+    "logo_url": "/samples/logo-2.svg",
+    "image_urls": [
+      "/samples/campus-2.svg",
+      "/samples/campus-3.svg"
+    ],
+    "video_urls": [],
+    "lat": 22.6273,
+    "lng": 120.266,
+    "city": "Kaohsiung",
+    "region": "Kaohsiung",
+    "type": "public",
+    "ranking": 7,
+    "is_featured": false,
+    "majors": [
+      "Kinh doanh",
+      "Khoa học biển",
+      "Kỹ thuật điện",
+      "Ngôn ngữ Anh"
+    ],
+    "tuition": "50.000–58.000 TWD/kỳ",
+    "scholarship": "Học bổng Chính phủ Đài Loan (Taiwan Scholarship) và học bổng riêng của trường cho SV quốc tế; mức và điều kiện thay đổi theo từng năm.",
+    "topik_req": "TOCFL cấp 3–4",
+    "ielts_req": "IELTS 6.0+",
+    "gpa_req": "GPA 7.5+/10",
+    "dorm_info": "KTX trong trường cạnh biển.",
+    "living_cost": "Khoảng 9.000–13.000 TWD/tháng tại Cao Hùng.",
+    "important_notes": "Khuôn viên ven biển; thế mạnh kinh doanh và khoa học biển.",
+    "sale_notes": "Gợi ý cho HS thích miền Nam, chi phí vừa phải.",
+    "updated_at": "2026-09-01T00:00:00Z",
+    "majors_detail": ""
+  },
+  {
+    "id": "d2000000-0000-4000-8000-000000000007",
+    "country": "tw",
+    "name_kr": "逢甲大學",
+    "name_en": "Feng Chia University",
+    "name_vi": "Đại học Phùng Giáp",
+    "logo_url": "/samples/logo-3.svg",
+    "image_urls": [
+      "/samples/campus-3.svg",
+      "/samples/campus-4.svg"
+    ],
+    "video_urls": [],
+    "lat": 24.179,
+    "lng": 120.6467,
+    "city": "Taichung",
+    "region": "Taichung",
+    "type": "private",
+    "ranking": 15,
+    "is_featured": false,
+    "majors": [
+      "Kinh doanh",
+      "Kỹ thuật máy tính",
+      "Kiến trúc",
+      "Kỹ thuật xây dựng",
+      "Tài chính"
+    ],
+    "tuition": "52.000–60.000 TWD/kỳ",
+    "scholarship": "Học bổng Chính phủ Đài Loan (Taiwan Scholarship) và học bổng riêng của trường cho SV quốc tế; mức và điều kiện thay đổi theo từng năm.",
+    "topik_req": "TOCFL cấp 3 hoặc học dự bị tiếng Hoa",
+    "ielts_req": "IELTS 5.5+",
+    "gpa_req": "GPA 7.0+/10",
+    "dorm_info": "KTX trong trường và nhiều nhà trọ quanh chợ đêm Phùng Giáp.",
+    "living_cost": "Khoảng 9.000–13.000 TWD/tháng tại Đài Trung.",
+    "important_notes": "Trường tư lớn, nhiều SV Việt Nam; yêu cầu đầu vào mềm hơn trường quốc lập.",
+    "sale_notes": "Phù hợp HS học lực khá, cần lộ trình tiếng Hoa.",
+    "updated_at": "2026-09-01T00:00:00Z",
+    "majors_detail": ""
+  },
+  {
+    "id": "d2000000-0000-4000-8000-000000000008",
+    "country": "tw",
+    "name_kr": "銘傳大學",
+    "name_en": "Ming Chuan University",
+    "name_vi": "Đại học Minh Truyền",
+    "logo_url": "/samples/logo-4.svg",
+    "image_urls": [
+      "/samples/campus-4.svg",
+      "/samples/campus-1.svg"
+    ],
+    "video_urls": [],
+    "lat": 25.0858,
+    "lng": 121.5271,
+    "city": "Taipei",
+    "region": "Taipei",
+    "type": "private",
+    "ranking": 20,
+    "is_featured": false,
+    "majors": [
+      "Kinh doanh",
+      "Du lịch – Khách sạn",
+      "Truyền thông",
+      "Công nghệ thông tin"
+    ],
+    "tuition": "50.000–58.000 TWD/kỳ",
+    "scholarship": "Học bổng Chính phủ Đài Loan (Taiwan Scholarship) và học bổng riêng của trường cho SV quốc tế; mức và điều kiện thay đổi theo từng năm.",
+    "topik_req": "Có chương trình dạy bằng tiếng Anh, không bắt buộc TOCFL",
+    "ielts_req": "IELTS 5.5+",
+    "gpa_req": "GPA 6.5+/10",
+    "dorm_info": "KTX cho SV quốc tế tại cả hai cơ sở.",
+    "living_cost": "Khoảng 12.000–18.000 TWD/tháng tại Đài Bắc (chưa gồm học phí).",
+    "important_notes": "Nhiều chương trình quốc tế bằng tiếng Anh.",
+    "sale_notes": "Phù hợp HS muốn học bằng tiếng Anh tại Đài Bắc.",
+    "updated_at": "2026-09-01T00:00:00Z",
     "majors_detail": ""
   }
 ]

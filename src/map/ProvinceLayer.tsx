@@ -1,22 +1,19 @@
 import { useEffect } from 'react';
 import L from 'leaflet';
 import { GeoJSON, useMap } from 'react-leaflet';
-import type { FeatureCollection } from 'geojson';
-import provinceData from '../data/korea-provinces.json';
-import { PROVINCE_META, type ProvinceKind } from './provinceMeta';
+import type { CountryCode } from '../lib/countries';
+import { COUNTRY_MAPS } from './countryMaps';
+import type { ProvinceKind, ProvinceMeta } from './provinceMeta';
 
 /**
- * South Korea's 17 administrative divisions, drawn beneath the school pins.
+ * The country's first-level divisions — Korea's 17 provinces or Taiwan's 22
+ * counties — drawn beneath the school pins.
  *
  * Purely decorative: every layer here is non-interactive so clicks fall through
  * to the markers. Visibility is driven entirely from CSS off the `.provinces-solo`
  * class that `MapController` toggles on zoom — nothing in this module re-renders
  * when the user zooms.
  */
-
-// The import is a plain JSON module, so TS widens `coordinates` to a union of
-// Polygon/MultiPolygon shapes that no longer matches the GeoJSON types.
-const provinces = provinceData as unknown as FeatureCollection;
 
 /** Sits between the polygons (overlayPane, 400) and the school pins (markerPane, 600). */
 const LABEL_PANE = 'province-labels';
@@ -43,7 +40,7 @@ const DEFAULT_OFFSET: Record<ProvinceKind, [number, number]> = {
  * child effects before parent effects. Building them here keeps the pane
  * creation and the markers in one effect, in the right order.
  */
-function ProvinceLabels() {
+function ProvinceLabels({ labels }: { labels: Record<string, ProvinceMeta> }) {
   const map = useMap();
 
   useEffect(() => {
@@ -53,7 +50,7 @@ function ProvinceLabels() {
     pane.style.zIndex = LABEL_PANE_Z;
     pane.style.pointerEvents = 'none';
 
-    const labels = Object.values(PROVINCE_META).map((meta) => {
+    const markers = Object.values(labels).map((meta) => {
       const [dx, dy] = meta.offset ?? DEFAULT_OFFSET[meta.kind];
       return L.marker(meta.anchor, {
         pane: LABEL_PANE,
@@ -74,18 +71,29 @@ function ProvinceLabels() {
     });
 
     return () => {
-      labels.forEach((label) => label.remove());
+      markers.forEach((marker) => marker.remove());
     };
-  }, [map]);
+    // Keyed on the table as well as the map: switching country swaps it, and
+    // the old country's names must come down with it.
+  }, [map, labels]);
 
   return null;
 }
 
-export default function ProvinceLayer() {
+export default function ProvinceLayer({ country }: { country: CountryCode }) {
+  const { shapes, labels, credit } = COUNTRY_MAPS[country];
   return (
     <>
-      <GeoJSON data={provinces} interactive={false} style={SHAPE_STYLE} />
-      <ProvinceLabels />
+      {/* Keyed on the country: react-leaflet reads `data` once at creation and
+          ignores a new one, so the layer is remounted instead. */}
+      <GeoJSON
+        key={country}
+        data={shapes}
+        interactive={false}
+        style={SHAPE_STYLE}
+        attribution={credit}
+      />
+      <ProvinceLabels labels={labels} />
     </>
   );
 }

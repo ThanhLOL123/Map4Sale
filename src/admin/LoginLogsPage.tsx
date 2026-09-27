@@ -2,8 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { fetchLoginLogs, fetchProfiles } from '../lib/api';
 import type { LoginLog, Profile } from '../lib/types';
 
-/** Countries considered "expected" for staff logins; anything else is flagged. */
-const EXPECTED_COUNTRIES = ['Vietnam', 'South Korea'];
+/**
+ * Countries considered "expected" for staff logins; anything else is flagged.
+ * Named as ip-api.com names them ('Taiwan', not 'Republic of China').
+ */
+const EXPECTED_COUNTRIES = ['Vietnam', 'South Korea', 'Taiwan'];
 
 export default function LoginLogsPage() {
   const [logs, setLogs] = useState<LoginLog[]>([]);

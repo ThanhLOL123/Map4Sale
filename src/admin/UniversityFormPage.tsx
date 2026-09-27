@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent } from 'react';
-import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
-import { useNavigate, useParams } from 'react-router-dom';
+import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   deleteUniversityImage,
   fetchUniversity,
@@ -8,6 +8,7 @@ import {
   saveUniversity,
   uploadUniversityImage,
 } from '../lib/api';
+import { COUNTRIES, COUNTRY_CODES, isCountryCode, type CountryCode } from '../lib/countries';
 import type { UniversityInput, UniversityType } from '../lib/types';
 import '../map/leafletIcon';
 
@@ -47,25 +48,21 @@ function RichField({
   );
 }
 
-const REGIONS = [
-  'Seoul', 'Gyeonggi', 'Incheon', 'Busan', 'Daegu', 'Daejeon', 'Gwangju',
-  'Ulsan', 'Sejong', 'Gangwon', 'Chungbuk', 'Chungnam', 'Jeonbuk', 'Jeonnam',
-  'Gyeongbuk', 'Gyeongnam', 'Jeju',
-];
-
-function emptyForm(): UniversityInput {
+function emptyForm(country: CountryCode): UniversityInput {
+  const { regions, defaultPin } = COUNTRIES[country];
   return {
     id: crypto.randomUUID(),
+    country,
     name_kr: '',
     name_en: '',
     name_vi: '',
     logo_url: null,
     image_urls: [],
     video_urls: [],
-    lat: 37.5665,
-    lng: 126.978,
+    lat: defaultPin[0],
+    lng: defaultPin[1],
     city: '',
-    region: 'Seoul',
+    region: regions[0],
     type: 'private',
     ranking: null,
     is_featured: false,
@@ -83,6 +80,20 @@ function emptyForm(): UniversityInput {
   };
 }
 
+/**
+ * Brings the pin back into view when it leaves it — after geocoding, or after
+ * a country switch moves it to the other country's default. `MapContainer`
+ * only reads `center` once, so this is what keeps the mini-map following.
+ * A click never triggers it: a clicked point is already on screen.
+ */
+function FollowPin({ position }: { position: [number, number] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!map.getBounds().contains(position)) map.setView(position, map.getZoom());
+  }, [map, position]);
+  return null;
+}
+
 /** Click on the mini-map moves the marker / fills lat-lng (spec §4.4). */
 function CoordinatePicker({ onPick }: { onPick: (lat: number, lng: number) => void }) {
   useMapEvents({
@@ -97,8 +108,15 @@ export default function UniversityFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isNew = !id;
+  // "+ Thêm trường" passes the list's country, so a school added while looking
+  // at Taiwan starts out Taiwanese.
+  const [params] = useSearchParams();
+  const requested = params.get('country');
 
-  const [form, setForm] = useState<UniversityInput>(emptyForm);
+  const [form, setForm] = useState<UniversityInput>(() =>
+    emptyForm(isCountryCode(requested) ? requested : 'kr'),
+  );
+  const country = COUNTRIES[form.country];
   const [majorsText, setMajorsText] = useState('');
   const [videoLink, setVideoLink] = useState('');
   const [loading, setLoading] = useState(!isNew);
@@ -128,6 +146,22 @@ export default function UniversityFormPage() {
 
   const markerPos = useMemo<[number, number]>(() => [form.lat, form.lng], [form.lat, form.lng]);
 
+  function onCountryChange(next: CountryCode) {
+    setForm((f) => {
+      const from = COUNTRIES[f.country];
+      const to = COUNTRIES[next];
+      // A pin still on the old country's default was never placed by anyone, so
+      // it moves with the country. A real, placed pin is left alone.
+      const untouched = f.lat === from.defaultPin[0] && f.lng === from.defaultPin[1];
+      return {
+        ...f,
+        country: next,
+        region: to.regions.includes(f.region) ? f.region : to.regions[0],
+        ...(untouched ? { lat: to.defaultPin[0], lng: to.defaultPin[1] } : {}),
+      };
+    });
+  }
+
   async function onGeocode() {
     const query = form.name_en || form.name_kr || form.name_vi;
     if (!query) {
@@ -136,7 +170,7 @@ export default function UniversityFormPage() {
     }
     setGeoStatus('Đang tìm tọa độ…');
     try {
-      const hit = await geocode(`${query} university`);
+      const hit = await geocode(`${query} university`, country.geocodeCode);
       if (!hit) {
         setGeoStatus('Không tìm thấy — hãy click vị trí trên bản đồ.');
         return;
@@ -227,6 +261,20 @@ export default function UniversityFormPage() {
       {error && <p className="form-error">{error}</p>}
 
       <fieldset>
+        <legend>Quốc gia</legend>
+        <label>Trường thuộc bản đồ *
+          <select
+            value={form.country}
+            onChange={(e) => onCountryChange(e.target.value as CountryCode)}
+          >
+            {COUNTRY_CODES.map((c) => (
+              <option key={c} value={c}>{COUNTRIES[c].label}</option>
+            ))}
+          </select>
+        </label>
+      </fieldset>
+
+      <fieldset>
         <legend>Tên trường</legend>
         <div className="form-grid">
           <label>Tên tiếng Việt *
@@ -235,7 +283,7 @@ export default function UniversityFormPage() {
           <label>Tên tiếng Anh *
             <input required value={form.name_en} onChange={(e) => set('name_en', e.target.value)} />
           </label>
-          <label>Tên tiếng Hàn
+          <label>{country.nativeNameLabel}
             <input value={form.name_kr} onChange={(e) => set('name_kr', e.target.value)} />
           </label>
         </div>
@@ -249,7 +297,7 @@ export default function UniversityFormPage() {
           </label>
           <label>Khu vực *
             <select value={form.region} onChange={(e) => set('region', e.target.value)}>
-              {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+              {country.regions.map((r) => <option key={r} value={r}>{r}</option>)}
             </select>
           </label>
           <label>Vĩ độ (lat) *
@@ -276,6 +324,7 @@ export default function UniversityFormPage() {
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <CoordinatePicker onPick={(lat, lng) => setForm((f) => ({ ...f, lat, lng }))} />
           <Marker position={markerPos} />
+          <FollowPin position={markerPos} />
         </MapContainer>
       </fieldset>
 
@@ -385,7 +434,7 @@ export default function UniversityFormPage() {
             />
             ★ Nổi bật
           </label>
-          <label>Yêu cầu TOPIK
+          <label>Yêu cầu {country.languageTest}
             <input value={form.topik_req} onChange={(e) => set('topik_req', e.target.value)} />
           </label>
           <label>Yêu cầu IELTS
@@ -406,7 +455,7 @@ export default function UniversityFormPage() {
           withTable
         />
         <RichField
-          label="Học phí (số đầu tiên trong nội dung dùng để lọc và sắp xếp — hãy mở đầu bằng số triệu KRW/kỳ, ví dụ: “4.2 triệu KRW/kỳ …”. Nếu dùng bảng, đặt số tiền ở ô thường, không đặt ở ô tiêu đề.)"
+          label={country.tuition.formHint}
           value={form.tuition}
           onChange={(html) => set('tuition', html)}
           withTable

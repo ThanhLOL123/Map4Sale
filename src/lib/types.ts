@@ -1,7 +1,16 @@
 export type UniversityType = 'public' | 'private';
 
+/** Kept in step with the check constraint on universities.country (0007). */
+export type CountryCode = 'kr' | 'tw';
+
 export interface University {
   id: string;
+  country: CountryCode;
+  /**
+   * The name in the country's own script: Korean for 'kr', Traditional Chinese
+   * for 'tw'. Kept as `name_kr` rather than renamed — the column predates the
+   * Taiwan map, and the label shown for it comes from `COUNTRIES`.
+   */
   name_kr: string;
   name_en: string;
   name_vi: string;
@@ -20,6 +29,7 @@ export interface University {
   majors_detail: string;
   tuition: string;
   scholarship: string;
+  /** The language test: TOPIK for 'kr', TOCFL for 'tw' (same reuse as name_kr). */
   topik_req: string;
   ielts_req: string;
   gpa_req: string;

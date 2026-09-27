@@ -5,7 +5,7 @@ export interface UniversityFilters {
   region: string; // '' = all
   major: string; // '' = all
   type: string; // '' | 'public' | 'private'
-  maxTuition: number | null; // million KRW per semester
+  maxTuition: number | null; // in the country's unit — see tuitionValue()
   maxRanking: number | null;
   featuredOnly: boolean;
 }
@@ -50,6 +50,23 @@ function toPlainText(value: string): string {
 export function parseTuitionMillions(tuition: string): number | null {
   const m = toPlainText(tuition).match(/(\d+(?:[.,]\d+)?)/);
   return m ? parseFloat(m[1].replace(',', '.')) : null;
+}
+
+/**
+ * A school's tuition in the unit its country's filter presets use (see
+ * `COUNTRIES[…].tuition.unitNote`): million KRW for Korea, thousand TWD for
+ * Taiwan.
+ *
+ * Taiwan needs one extra rule. "55.000 TWD" and "55,000 TWD" both parse as 55
+ * already, because the separator reads as a decimal point; but "55000 TWD"
+ * with no separator parses as 55000. No semester in Taiwan comes anywhere near
+ * 1,000 thousand TWD (a million), so a value that large was typed in whole TWD
+ * and is scaled down.
+ */
+export function tuitionValue(u: Pick<University, 'tuition' | 'country'>): number | null {
+  const n = parseTuitionMillions(u.tuition);
+  if (n == null) return null;
+  return u.country === 'tw' && n >= 1000 ? n / 1000 : n;
 }
 
 /**
@@ -105,7 +122,7 @@ export function filterUniversities(
     if (f.major && !u.majors.includes(f.major)) return false;
     if (f.type && u.type !== f.type) return false;
     if (f.maxTuition != null) {
-      const t = parseTuitionMillions(u.tuition);
+      const t = tuitionValue(u);
       if (t != null && t > f.maxTuition) return false;
     }
     if (f.maxRanking != null && (u.ranking == null || u.ranking > f.maxRanking)) {

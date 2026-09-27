@@ -41,7 +41,8 @@ export interface BasemapSpec {
   zoomOffset: number;
 }
 
-const KOSTAT_CREDIT = 'Ranh giới hành chính: <a href="https://kostat.go.kr">KOSTAT</a>';
+// The boundary credit (KOSTAT, or the Taiwan source) is not here: it rides on
+// the country's GeoJSON layer (see countryMaps.ts), so these stay country-free.
 
 const STREET: BasemapSpec = {
   url:
@@ -49,7 +50,7 @@ const STREET: BasemapSpec = {
     (cartoKey ? `?key=${cartoKey}` : ''),
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors ' +
-    `&copy; <a href="https://carto.com/attributions">CARTO</a> | ${KOSTAT_CREDIT}`,
+    '&copy; <a href="https://carto.com/attributions">CARTO</a>',
   maxZoom: 20,
   tileSize: 256,
   zoomOffset: 0,
@@ -69,8 +70,7 @@ const SATELLITE: BasemapSpec = {
     `?access_token=${mapboxToken ?? ''}`,
   attribution:
     '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-    `| ${KOSTAT_CREDIT}`,
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   maxZoom: 19,
   tileSize: 512,
   zoomOffset: -1,

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { deleteUniversity, fetchUniversities } from '../lib/api';
+import { COUNTRIES, COUNTRY_CODES, type CountryCode } from '../lib/countries';
 import type { University } from '../lib/types';
 
 export default function UniversityListPage() {
   const [universities, setUniversities] = useState<University[]>([]);
   const [q, setQ] = useState('');
+  const [country, setCountry] = useState<CountryCode | ''>('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -22,21 +24,38 @@ export default function UniversityListPage() {
     }
   }
 
-  const shown = universities.filter((u) =>
+  const inCountry = country ? universities.filter((u) => u.country === country) : universities;
+  const shown = inCountry.filter((u) =>
     `${u.name_vi} ${u.name_en} ${u.name_kr} ${u.city}`.toLowerCase().includes(q.toLowerCase()),
   );
 
   return (
     <div>
       <div className="admin-toolbar">
-        <h1>Trường đại học ({universities.length})</h1>
+        <h1>Trường đại học ({inCountry.length})</h1>
+        <select
+          value={country}
+          onChange={(e) => setCountry(e.target.value as CountryCode | '')}
+          aria-label="Quốc gia"
+        >
+          <option value="">Tất cả quốc gia</option>
+          {COUNTRY_CODES.map((c) => (
+            <option key={c} value={c}>{COUNTRIES[c].label}</option>
+          ))}
+        </select>
         <input
           type="search"
           placeholder="Tìm kiếm…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <Link to="/admin/universities/new" className="btn btn-primary">+ Thêm trường</Link>
+        {/* Carries the chosen country so a new school starts on the right map. */}
+        <Link
+          to={`/admin/universities/new${country ? `?country=${country}` : ''}`}
+          className="btn btn-primary"
+        >
+          + Thêm trường
+        </Link>
       </div>
       {error && <p className="form-error">{error}</p>}
       <div className="table-scroll">
@@ -63,7 +82,11 @@ export default function UniversityListPage() {
                 <br />
                 <span className="muted">{u.name_en}</span>
               </td>
-              <td>{u.city}</td>
+              <td>
+                {u.city}
+                <br />
+                <span className="muted">{COUNTRIES[u.country].label}</span>
+              </td>
               <td>{u.type === 'public' ? 'Công lập' : 'Tư thục'}</td>
               <td>{u.ranking ?? '—'}</td>
               <td>{(u.logo_url ? 1 : 0) + u.image_urls.length}</td>

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { trackEvent } from './activity';
 import { fetchUniversities } from './api';
 import { EMPTY_FILTERS, filterUniversities, type UniversityFilters } from './filters';
-import type { University } from './types';
+import type { CountryCode, University } from './types';
 
 /** The search box fires per keystroke; only a settled query is worth a row. */
 const SEARCH_DEBOUNCE_MS = 1200;
@@ -16,9 +16,14 @@ const MIN_SEARCH_LENGTH = 2;
  * supabase/migrations/0006_activity_tracking.sql). Both setters are handed to
  * the UI raw, so wrapping them here instruments every call site — map pins,
  * list rows, the filter bar — without touching a single component.
+ *
+ * `country` narrows everything to one map. Schools are still fetched once for
+ * both countries; `universities` is the chosen country's share, so the filter
+ * bar's options, the list, its counts and the tracked result counts all become
+ * per-country without any of them knowing countries exist.
  */
-export function useUniversityBrowser() {
-  const [universities, setUniversities] = useState<University[]>([]);
+export function useUniversityBrowser(country: CountryCode) {
+  const [allUniversities, setUniversities] = useState<University[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<UniversityFilters>(EMPTY_FILTERS);
@@ -30,6 +35,11 @@ export function useUniversityBrowser() {
       .catch((err) => setError(err instanceof Error ? err.message : 'Không tải được dữ liệu.'))
       .finally(() => setLoading(false));
   }, []);
+
+  const universities = useMemo(
+    () => allUniversities.filter((u) => u.country === country),
+    [allUniversities, country],
+  );
 
   const filtered = useMemo(
     () => filterUniversities(universities, filters),
@@ -95,6 +105,31 @@ export function useUniversityBrowser() {
   useEffect(() => () => {
     if (searchTimer.current) clearTimeout(searchTimer.current);
   }, []);
+
+  // A switch of country starts the new map clean: a Korean region filter or an
+  // open Korean profile means nothing on the Taiwan map. Filters are reset
+  // directly rather than through trackedSetFilters so the switch is recorded
+  // as one `country=…` event instead of also logging a `reset`.
+  const shownCountry = useRef(country);
+  useEffect(() => {
+    if (shownCountry.current === country) return; // first render, or no change
+    shownCountry.current = country;
+
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = null;
+    lastQuery.current = '';
+    filtersRef.current = EMPTY_FILTERS;
+    setFilters(EMPTY_FILTERS);
+    setSelected(null);
+
+    // `filter` is an existing event type, so this needs no schema change; it
+    // tells managers which market each person was browsing.
+    trackEvent('filter', {
+      detail: `country=${country}`,
+      // Already the new country's schools: the ref is refreshed during render.
+      resultCount: universitiesRef.current.length,
+    });
+  }, [country]);
 
   return {
     universities,

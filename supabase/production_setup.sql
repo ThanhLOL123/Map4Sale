@@ -30,6 +30,7 @@ create table if not exists public.universities (
   type            text not null default 'private' check (type in ('public', 'private')),
   ranking         int,
   is_featured     boolean not null default false,
+  country         text not null default 'kr' check (country in ('kr', 'tw')),
   majors          jsonb not null default '[]'::jsonb,
   majors_detail   text not null default '',
   tuition         text not null default '',
@@ -50,6 +51,18 @@ alter table public.universities add column if not exists video_urls      jsonb n
 alter table public.universities add column if not exists important_notes text  not null default '';
 alter table public.universities add column if not exists majors_detail   text  not null default '';
 alter table public.universities add column if not exists is_featured     boolean not null default false;
+alter table public.universities add column if not exists country         text    not null default 'kr';
+-- An older table gets the column without the inline check above, so add it here
+-- (guarded: `add constraint` has no `if not exists`).
+do $$
+begin
+  if not exists (select 1 from pg_constraint
+                 where conrelid = 'public.universities'::regclass
+                   and pg_get_constraintdef(oid) like '%country%') then
+    alter table public.universities
+      add constraint universities_country_check check (country in ('kr', 'tw'));
+  end if;
+end $$;
 
 create table if not exists public.profiles (
   id         uuid primary key references auth.users (id) on delete cascade,

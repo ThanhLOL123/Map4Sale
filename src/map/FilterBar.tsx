@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react';
+import { COUNTRIES, type CountryCode } from '../lib/countries';
 import type { UniversityFilters } from '../lib/filters';
 import { EMPTY_FILTERS } from '../lib/filters';
 import type { University } from '../lib/types';
 
 interface Props {
+  /** Picks the tuition presets and their unit; everything else is data-driven. */
+  country: CountryCode;
   universities: University[];
   filters: UniversityFilters;
   onChange: (f: UniversityFilters) => void;
@@ -22,7 +25,7 @@ function activeFilterCount(f: UniversityFilters): number {
   return n;
 }
 
-export default function FilterBar({ universities, filters, onChange, matchCount }: Props) {
+export default function FilterBar({ country, universities, filters, onChange, matchCount }: Props) {
   // On mobile the selects live in a sheet toggled by this state; on desktop
   // CSS keeps the panel visible and hides the toggle button.
   const [open, setOpen] = useState(false);
@@ -86,10 +89,9 @@ export default function FilterBar({ universities, filters, onChange, matchCount 
           onChange={(e) => set({ maxTuition: e.target.value ? Number(e.target.value) : null })}
         >
           <option value="">Học phí: tất cả</option>
-          <option value="2.5">≤ 2.5 triệu KRW/kỳ</option>
-          <option value="4">≤ 4 triệu KRW/kỳ</option>
-          <option value="5">≤ 5 triệu KRW/kỳ</option>
-          <option value="6">≤ 6 triệu KRW/kỳ</option>
+          {COUNTRIES[country].tuition.presets.map((p) => (
+            <option key={p.value} value={p.value}>{p.label}</option>
+          ))}
         </select>
         <select
           value={filters.maxRanking ?? ''}

@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import L, { type Map as LeafletMap } from 'leaflet';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import AppHeader from '../components/AppHeader';
 import { BASEMAPS, type Basemap } from './basemaps';
+import { COUNTRIES } from '../lib/countries';
 import { EMPTY_FILTERS } from '../lib/filters';
+import { useCountry } from '../lib/useCountry';
 import { useFullscreen } from '../lib/useFullscreen';
 import { useUniversityBrowser } from '../lib/useUniversityBrowser';
 import type { University } from '../lib/types';
@@ -16,7 +18,6 @@ import SideList, { type SortKey } from './SideList';
 import { createClusterIcon, createSchoolIcon } from './schoolIcon';
 import './leafletIcon';
 
-// South Korea, framed nation-wide
 /**
  * Leaflet treats 3px of movement as a map drag and then suppresses the click
  * that follows, so a press that wobbles — a trackpad, and every touchscreen —
@@ -25,10 +26,6 @@ import './leafletIcon';
 // Typed by hand: @types/leaflet does not surface `options` on the prototype.
 (L.Draggable.prototype as unknown as { options: { clickTolerance: number } })
   .options.clickTolerance = 10;
-
-const KOREA_CENTER: [number, number] = [36.35, 127.8];
-const KOREA_ZOOM = 7;
-const HOME_VIEW = { center: KOREA_CENTER as L.LatLngExpression, zoom: KOREA_ZOOM };
 
 /** Pin name labels only appear once the pins have room to breathe. Below this
  *  the Seoul cluster (14 of 22 schools) overlaps into an unreadable stack. */
@@ -147,8 +144,10 @@ function SchoolMarker({
 }
 
 export default function MapView() {
+  const [country] = useCountry();
+  const { home, label: countryLabel } = COUNTRIES[country];
   const { universities, filtered, loading, error, filters, setFilters, selected, setSelected } =
-    useUniversityBrowser();
+    useUniversityBrowser(country);
   const [sort, setSort] = useState<SortKey>('ranking');
   const [mobileView, setMobileView] = useState<MobileView>('map');
   const [map, setMap] = useState<LeafletMap | null>(null);
@@ -181,6 +180,16 @@ export default function MapView() {
     return () => clearTimeout(t);
   }, [presentation, map]);
 
+  // Re-frame on a country switch. setView rather than flyTo: flying 1,500 km
+  // between Korea and Taiwan spends most of the animation on half-loaded tiles.
+  // Only the switch moves the map — first load takes `home` from MapContainer.
+  const framedCountry = useRef(country);
+  useEffect(() => {
+    if (!map || framedCountry.current === country) return;
+    framedCountry.current = country;
+    map.setView(home.center, home.zoom);
+  }, [country, map, home]);
+
   // Which school the pointer is over in the results list; its pin is ringed.
   const [hovered, setHovered] = useState<string | null>(null);
   const handleHover = useCallback((u: University | null) => setHovered(u?.id ?? null), []);
@@ -190,6 +199,7 @@ export default function MapView() {
       <AppHeader />
 
       <FilterBar
+        country={country}
         universities={universities}
         filters={filters}
         onChange={setFilters}
@@ -219,8 +229,8 @@ export default function MapView() {
         <div className={`map-wrap${selected ? ' has-detail' : ''}`}>
           <MapContainer
             ref={setMap}
-            center={KOREA_CENTER}
-            zoom={KOREA_ZOOM}
+            center={home.center}
+            zoom={home.zoom}
             minZoom={6}
             zoomControl={false} // replaced by <MapControls />
             className="leaflet-host"
@@ -235,7 +245,7 @@ export default function MapView() {
               tileSize={tiles.tileSize}
               zoomOffset={tiles.zoomOffset}
             />
-            <ProvinceLayer />
+            <ProvinceLayer country={country} />
             <MapController selected={selected} mobileView={mobileView} basemap={basemap} />
             <MarkerClusterGroup
               chunkedLoading
@@ -257,7 +267,8 @@ export default function MapView() {
 
           <MapControls
             map={map}
-            home={HOME_VIEW}
+            home={home}
+            homeLabel={`Xem toàn ${countryLabel}`}
             basemap={basemap}
             onBasemapChange={setBasemap}
             presentation={presentation}

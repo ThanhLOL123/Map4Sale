@@ -1,4 +1,5 @@
 import RichText from '../components/RichText';
+import { COUNTRIES } from '../lib/countries';
 import type { University } from '../lib/types';
 
 interface Props {
@@ -142,7 +143,7 @@ export default function DetailDrawer({ university: u, onClose }: Props) {
 
       <Section title="📋 Điều kiện đầu vào">
         <ul className="req-list">
-          <li><strong>TOPIK:</strong> {u.topik_req || '—'}</li>
+          <li><strong>{COUNTRIES[u.country].languageTest}:</strong> {u.topik_req || '—'}</li>
           <li><strong>IELTS:</strong> {u.ielts_req || '—'}</li>
           <li><strong>GPA:</strong> {u.gpa_req || '—'}</li>
         </ul>

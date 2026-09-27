@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { parseTuitionMillions, scoreMajors } from '../lib/filters';
+import { scoreMajors, tuitionValue } from '../lib/filters';
 import type { University } from '../lib/types';
 
 export type SortKey = 'ranking' | 'name' | 'tuition';
@@ -12,8 +12,8 @@ function sortUniversities(list: University[], key: SortKey, query: string): Univ
       break;
     case 'tuition':
       copy.sort((a, b) => {
-        const ta = parseTuitionMillions(a.tuition);
-        const tb = parseTuitionMillions(b.tuition);
+        const ta = tuitionValue(a);
+        const tb = tuitionValue(b);
         return (ta ?? Infinity) - (tb ?? Infinity); // unparseable tuition sorts last
       });
       break;

@@ -31,7 +31,7 @@ export default function LoginPage() {
     <div className="login-page">
       <form className="login-card" onSubmit={onSubmit}>
         <h1>🗺️ Map4Sale</h1>
-        <p className="login-subtitle">Bản đồ trường đại học Hàn Quốc — dành cho đội ngũ tư vấn</p>
+        <p className="login-subtitle">Bản đồ trường đại học Hàn Quốc &amp; Đài Loan — dành cho đội ngũ tư vấn</p>
         {isDemoMode && (
           <p className="demo-note">
             Đang chạy <strong>chế độ demo</strong> (chưa cấu hình Supabase) — không cần đăng nhập.

@@ -82,6 +82,13 @@ re-running one is harmless:
   behind **Quản trị → Hoạt động nhân viên**. Without it that page errors and
   tracking writes are rejected.
 
+- `0007_add_country.sql` — adds `universities.country` (`'kr'` or `'tw'`,
+  default `'kr'`) behind the **Hàn Quốc | Đài Loan** switch. Every existing
+  school stays on the Korea map.
+  ⚠️ **Run this before the frontend that uses it is deployed.** The app saves
+  whole rows, so until the column exists, saving *any* school fails. (Reading
+  is safe either way: without the column every school is treated as Korean.)
+
 `supabase/production_setup.sql` already contains every column for a fresh
 install; the migrations are only for databases created before a change.
 
@@ -161,6 +168,9 @@ Once steps 1–5 are done, confirm the live system end-to-end:
       is rejected without logging them out, a correct change succeeds, and the
       new password works on the next sign-in.
 - [ ] **Quản trị → Sao lưu → Tải bản sao lưu** downloads a `.json` of live data.
+- [ ] Switch to **Đài Loan**, add a Taiwanese school in **Quản trị** (Quốc gia =
+      Đài Loan), and confirm it appears on the Taiwan map only; then edit a
+      Korean school and save, to confirm `0007` is in place.
 - [ ] As that sale user, open a few schools and run a search; then in
       **Quản trị → Hoạt động nhân viên** (7 ngày) their row shows a recent
       "Lần truy cập gần nhất" and a non-zero "Số thao tác", with the actions

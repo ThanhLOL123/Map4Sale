@@ -1,6 +1,7 @@
-# Map4Sale — Bản đồ trường đại học Hàn Quốc
+# Map4Sale — Bản đồ trường đại học Hàn Quốc & Đài Loan
 
-Interactive map of South Korean universities for study-abroad sales consulting.
+Interactive map of South Korean and Taiwanese universities for study-abroad
+sales consulting.
 Sales staff click any university marker to instantly see the full profile —
 programs, tuition, admission requirements, scholarships, housing, living costs,
 photos and internal sales notes — without leaving the map.
@@ -12,6 +13,10 @@ to **Vercel**; everything fits in the free tiers.
 ## Features
 
 - 🗺️ Full map of South Korea with one marker per university, clustered in dense areas (Seoul)
+- 🇹🇼 A Taiwan map with every same feature, switched with **Hàn Quốc | Đài Loan**
+  at the top of the page; the choice is kept in the URL (`/?country=tw`) and
+  remembered for next time. Taiwan uses TOCFL for the language test and reads
+  tuition in TWD
 - 🏫 Side drawer with the complete school profile, logo, campus photo gallery and videos
 - 🏷️ University name shown as an always-visible label on each map marker
 - 🎥 Videos per school — admin uploads a file or pastes a link (YouTube/Vimeo/direct)
@@ -88,7 +93,9 @@ so every screen is browsable. Admin edits are kept in memory only.
 
 6. **Load data**: sign in as the admin and add universities through
    *Quản trị → Trường đại học* (the sample dataset in
-   `src/data/universities.sample.json` is a useful starting template).
+   `src/data/universities.sample.json` is a useful starting template). Pick the
+   school's **Quốc gia** first — it switches the region list, the language-test
+   label and the tuition format for Taiwan.
 
 ## Deployment (Vercel)
 
@@ -114,6 +121,9 @@ supabase/
 
 ## Notes & constraints
 
+- Administrative boundaries: Korea from KOSTAT; Taiwan from
+  [g0v/twgeojson](https://github.com/g0v/twgeojson) (`twCounty2010`, CC0),
+  simplified with mapshaper to ~80 KB.
 - IP geolocation is approximate (city-level); VPNs show the VPN server's
   location, and localhost logins record no location.
 - ip-api.com free tier is HTTP-only (~45 req/min) — plenty for login events.

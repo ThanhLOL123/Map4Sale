@@ -67,6 +67,9 @@ function normalizeUniversity(row: Record<string, unknown>): University {
     image_urls: (row.image_urls as string[] | null) ?? [],
     video_urls: (row.video_urls as string[] | null) ?? [],
     majors: (row.majors as string[] | null) ?? [],
+    // Before migration 0007 the column does not exist; every school then was
+    // Korean, so reading keeps working and the Taiwan map is simply empty.
+    country: (row.country as University['country'] | undefined) ?? 'kr',
   };
 }
 
@@ -131,8 +134,9 @@ export interface GeocodeResult {
   display_name: string;
 }
 
-export async function geocode(query: string): Promise<GeocodeResult | null> {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=kr&q=${encodeURIComponent(query)}`;
+/** `countryCode` is ISO 3166-1 alpha-2 ('kr', 'tw'); see COUNTRIES[…].geocodeCode. */
+export async function geocode(query: string, countryCode: string): Promise<GeocodeResult | null> {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(query)}`;
   const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
   if (!res.ok) throw new Error(`Nominatim trả về lỗi ${res.status}`);
   const data: Array<{ lat: string; lon: string; display_name: string }> = await res.json();

@@ -5,6 +5,8 @@ interface Props {
   map: LeafletMap | null;
   /** The nation-wide framing the reset button returns to. */
   home: { center: LatLngExpression; zoom: number };
+  /** Tooltip for that button, naming the country ("Xem toàn Đài Loan"). */
+  homeLabel: string;
   basemap: Basemap;
   onBasemapChange: (next: Basemap) => void;
   presentation: boolean;
@@ -20,6 +22,7 @@ interface Props {
 export default function MapControls({
   map,
   home,
+  homeLabel,
   basemap,
   onBasemapChange,
   presentation,
@@ -58,8 +61,8 @@ export default function MapControls({
       <button
         type="button"
         className="map-control"
-        aria-label="Xem toàn Hàn Quốc"
-        title="Xem toàn Hàn Quốc"
+        aria-label={homeLabel}
+        title={homeLabel}
         onClick={() => map.flyTo(home.center, home.zoom, { duration: 0.6 })}
       >
         <svg viewBox="0 0 20 20" aria-hidden focusable="false">

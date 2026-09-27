@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Map4Sale is an interactive map of South Korean universities for study-abroad sales consulting (a Vietnamese company). Sales staff click a marker to see the full school profile; admins manage universities, sale accounts, and login logs. Stack: React 18 + TypeScript + Vite, React-Leaflet (OpenStreetMap), Supabase (Postgres, Auth, Storage, Deno Edge Functions). Frontend deploys to Vercel.
+Map4Sale is an interactive map of South Korean and Taiwanese universities for study-abroad sales consulting (a Vietnamese company). Sales staff click a marker to see the full school profile; admins manage universities, sale accounts, and login logs. Stack: React 18 + TypeScript + Vite, React-Leaflet (OpenStreetMap), Supabase (Postgres, Auth, Storage, Deno Edge Functions). Frontend deploys to Vercel.
 
 ## Commands
 
@@ -33,10 +33,21 @@ Edge Functions are Deno, not part of the npm build. They deploy via `supabase fu
 
 - `normalizeUniversity()` coerces nullable jsonb columns (`image_urls`, `video_urls`, `majors`) to `[]` — new jsonb array columns must be added there.
 - Storage uploads go to the public `university-images` bucket under `<universityId>/{logo|photos|videos}/`; deleting a university best-effort-removes its Storage folder.
-- Geocoding uses Nominatim (restricted to `countrycodes=kr`).
+- Geocoding uses Nominatim, restricted to the school's country (`COUNTRIES[…].geocodeCode`).
 - `src/lib/useUniversityBrowser.ts` is the shared hook for the map and docked-list views: one fetch, shared filter + selection state.
 - `src/lib/filters.ts`: tuition is stored as free text; the max-tuition filter parses the *first number* in the string as million KRW per semester.
 - `src/lib/filters.ts` also owns search: the box matches `majors` **only** (not school names). `searchKey()` folds case, Vietnamese tone marks and đ→d; `scoreMajors()` requires every typed token to land inside one major and returns a rank (exact > prefix > phrase > any-order) that `SideList` orders by while the box has text in it.
+
+### Countries (Korea and Taiwan)
+
+One map shows one country at a time; **Hàn Quốc | Đài Loan** in `AppHeader` switches it. `universities.country` (`'kr' | 'tw'`, migration 0007) says which map a school belongs to.
+
+- `src/lib/countries.ts` → `COUNTRIES` is the only place for per-country values: home view, region list, labels, tuition presets and unit, geocoding code. Don't hard-code a country literal in a component.
+- `src/map/countryMaps.ts` → the boundary overlay per country (GeoJSON, hand-placed labels in `provinceMeta.ts` / `taiwanMeta.ts`, and the data credit, which rides on the GeoJSON layer's `attribution` rather than on the tile layers).
+- `src/lib/useCountry.ts` → the chosen country lives in the URL (`?country=tw`), with `localStorage` as the fallback.
+- `useUniversityBrowser(country)` fetches once and narrows to the country, so everything downstream is per-country without knowing it. A switch clears filters and selection and is tracked as a `filter` event `country=tw`.
+- Columns are reused, not renamed: `name_kr` holds the Chinese name for Taiwan and `topik_req` holds TOCFL; the labels come from `COUNTRIES`.
+- Tuition's "first number" is million KRW in Korea and **thousand TWD** in Taiwan — `tuitionValue()` in `filters.ts` applies that (and scales an unseparated `55000` down).
 
 ### Activity tracking
 
