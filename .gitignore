@@ -6,3 +6,6 @@ dist-ssr
 .env.*
 !.env.example
 .DS_Store
+
+# Local image backups from `npm run backup:images` — hundreds of MB, never commit.
+backups/

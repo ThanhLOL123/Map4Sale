@@ -45,8 +45,8 @@ supabase functions deploy log-login
 ```
 
 > These functions only power **creating sale accounts**, **disable/reset**, and
-> **login tracking**. The map, university management, images/videos, and backup
-> all work without them — so you can do steps 4–5 first and this afterward.
+> **login tracking**. The map, university management and images/videos all work
+> without them — so you can do steps 4–5 first and this afterward.
 
 ## 4. Point the frontend at Supabase (Vercel)
 - In Supabase → **Project Settings → API**, copy the **Project URL** and the
@@ -127,28 +127,102 @@ which is **rate-limited (~3–4/hour)** and may land in spam. For reliable
 account-creation emails, set up custom SMTP in **Authentication → Emails → SMTP**
 (any provider: Resend, SendGrid, Amazon SES, your Google Workspace, …).
 
-## 7. Turn on the weekly automated backup
-- Supabase → **Project Settings → Database → Connection string → URI** — copy the
-  `postgresql://…` value.
+## 7. Turn on the weekly database backup
+On the **free plan, Supabase keeps no backups you can restore** — daily backups
+are a Pro-plan feature. This workflow is the only copy of the database.
+
+- Supabase → **Connect** (top of the project dashboard) → **Session pooler** →
+  copy the URI, `postgresql://postgres.<ref>:<password>@aws-…pooler.supabase.com:5432/postgres`,
+  with your database password filled in.
+  ⚠️ Use **Session pooler**, not "Direct connection": the direct host is
+  IPv6-only on the free plan and GitHub's runners are IPv4, so it cannot connect.
 - GitHub repo → **Settings → Secrets and variables → Actions → New repository
-  secret** → name `SUPABASE_DB_URL`, value = that URI.
-- GitHub **Actions** tab → *Weekly database backup* → **Run workflow** to test it,
-  then download the `db-backup` artifact to confirm.
-- ⚠️ **Keep this repository private** — backup artifacts contain the full database.
+  secret** → name `SUPABASE_DB_URL`, value = that URI. (Step 8 uses the same secret.)
+- GitHub **Actions** tab → *Weekly database backup* → **Run workflow**. Do this
+  **before** step 8 runs for the first time — see the note there.
+- It runs every Monday 02:00 giờ Việt Nam and keeps each copy **90 days**, as an
+  artifact named `db-backup-<date>-run<n>` (`roles.sql`, `schema.sql`,
+  `data.sql`, plus row counts). `data.sql` includes the login accounts.
+- Each run **proves its backup restores**: it loads the dump into a throwaway
+  database, re-applies `production_setup.sql`, and compares row counts with
+  production. A red run means the backup is not trustworthy — look at it.
+- ⚠️ **Keep this repository private** — the artifacts contain the whole
+  database, including staff emails, password hashes and login IPs.
+- Uploaded **images and videos are not in it** — no database backup covers
+  Storage. See step 9.
 
 ## 8. Turn on the 30-day activity purge
 The **Hoạt động nhân viên** screen tells staff their activity is kept for 30 days;
 this workflow is what makes that true.
 
-- It uses the **same `SUPABASE_DB_URL` secret** as step 7 — if you did that step,
-  there is nothing to add here.
+- It uses the **same `SUPABASE_DB_URL` secret** (Session pooler URI) as step 7 —
+  if you did that step, there is nothing to add here.
+- ⚠️ Its **first** successful run deletes every activity row older than 30 days in
+  one go. That is the policy, but run the backup (step 7) first so a copy exists.
 - GitHub **Actions** tab → *Purge old activity data* → **Run workflow** to test it.
   It runs daily at 01:20 giờ Việt Nam thereafter.
 - It deletes `activity_events` and "Mở lại" rows older than 30 days. Password
   sign-ins are kept indefinitely as the security audit trail.
 - ⚠️ GitHub disables scheduled workflows after **60 days without repo activity**.
   If the repo goes quiet, re-enable it from the Actions tab, or the purge stops
-  silently while the app keeps promising 30-day retention.
+  silently while the app keeps promising 30-day retention. The same applies to
+  the weekly backup.
+
+## 9. Back up images and videos (monthly)
+Logos, photos and videos live in Supabase Storage, which **no database backup
+covers** — not step 7, and not Supabase's own backups on paid plans either.
+Keep a copy on a computer:
+
+```bash
+npm run backup:images                      # → ./backups/images
+npm run backup:images -- --out D:\Map4Sale-anh   # or any folder / external drive
+```
+
+- Run it in the project folder that has the app's `.env` (it only needs the
+  public `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`).
+- The first run downloads everything (~420 MB as of Oct 2026); later runs only
+  fetch new files. Files deleted in Quản trị are **kept** in the backup.
+- It ends with `Mới tải … · Đã có sẵn … · Lỗi 0`. Anything other than `Lỗi: 0`
+  means the copy is incomplete — run it again.
+- Do it **monthly**, and after any big batch of uploads. Copy the folder to a
+  second place (external drive, Google Drive) — one copy on one laptop is not
+  a backup.
+
+---
+
+## Restoring from a backup
+Use this if the project is lost, or data was deleted and must come back.
+Restore into a **new** Supabase project; once it checks out, point the app at it.
+
+1. **Download the backup:** GitHub → **Actions** → *Weekly database backup* →
+   the run from before the problem → **Artifacts** → `db-backup-…` → unzip.
+2. **Create a new project** at [supabase.com](https://supabase.com) and copy its
+   **Session pooler** URI (as in step 7).
+3. **Restore the database** (needs `psql`; on Windows install PostgreSQL 17):
+   ```bash
+   psql --single-transaction --variable ON_ERROR_STOP=1 \
+     --file roles.sql --file schema.sql \
+     --command 'SET session_replication_role = replica' \
+     --file data.sql \
+     --dbname "<new project's Session pooler URI>"
+   ```
+   If it stops on a line mentioning `cli_login_postgres`, delete that line from
+   `roles.sql` and run it again (a known Supabase issue).
+4. **Run `supabase/production_setup.sql`** in the new project's SQL editor. The
+   dump leaves out what lives in Supabase's own schemas — the trigger that
+   creates profiles for new accounts, the `university-images` bucket and its
+   policies — and this script puts them back. It is safe to re-run. (The weekly
+   workflow runs exactly steps 3–4 every week, so this path is tested.)
+5. **Restore images:** upload the contents of your `backups/images` folder into
+   the new project's `university-images` bucket, keeping the folder structure
+   (Storage → `university-images` → drag each school's folder in; skip the
+   `_manifest-*.json` files).
+6. **Edge Functions:** deploy them to the new project (step 3), and update
+   `PROJECT_REF` in `.github/workflows/deploy-functions.yml`.
+7. **Point the app at it:** update `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`
+   in Vercel and redeploy (step 4), and update the `SUPABASE_DB_URL` secret.
+   Everyone signs in again with their **same passwords** — accounts come back
+   with `data.sql`.
 
 ---
 
@@ -167,7 +241,9 @@ Once steps 1–5 are done, confirm the live system end-to-end:
 - [ ] As that sale user, **Đổi mật khẩu** in the header: a wrong current password
       is rejected without logging them out, a correct change succeeds, and the
       new password works on the next sign-in.
-- [ ] **Quản trị → Sao lưu → Tải bản sao lưu** downloads a `.json` of live data.
+- [ ] GitHub **Actions** → *Weekly database backup* → **Run workflow** → green,
+      with a `db-backup-…` artifact and every count marked `OK` in the last step.
+- [ ] `npm run backup:images` ends with `Lỗi: 0`.
 - [ ] Switch to **Đài Loan**, add a Taiwanese school in **Quản trị** (Quốc gia =
       Đài Loan), and confirm it appears on the Taiwan map only; then edit a
       Korean school and save, to confirm `0007` is in place.

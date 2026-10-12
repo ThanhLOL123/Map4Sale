@@ -129,5 +129,11 @@ supabase/
 - ip-api.com free tier is HTTP-only (~45 req/min) — plenty for login events.
 - Compress images before upload (≤ ~1600px) to stay within the Storage free tier;
   deleting a school or photo also removes its files from Storage.
+- **Backups:** the Supabase free plan keeps no restorable backups, so the repo
+  carries its own. The *Weekly database backup* workflow dumps the database to
+  a 90-day GitHub artifact and proves each copy restores; `npm run backup:images`
+  copies uploaded images/videos to a computer, since no database backup covers
+  Storage. Setup and restore steps: [PRODUCTION.md](PRODUCTION.md) §7, §9 and
+  *Restoring from a backup*.
 - Inform sales staff that login locations **and in-app activity** (schools
   opened, searches, filters) are recorded.

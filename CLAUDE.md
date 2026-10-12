@@ -17,6 +17,8 @@ npm run preview
 
 There is no linter and no test framework configured. `npm run build` (or `npx tsc -b`) is the only automated check — run it before committing.
 
+`npm run backup:images` (`scripts/backup-images.mjs`) mirrors the `university-images` Storage bucket to `backups/images/` (git-ignored) using only the public anon key from `.env`; it never deletes local files.
+
 Edge Functions are Deno, not part of the npm build. They deploy via `supabase functions deploy <name>` or the GitHub Actions workflow `.github/workflows/deploy-functions.yml` (manual dispatch, plus auto-deploy on pushes to `main` that touch `supabase/functions/**`; the Supabase `PROJECT_REF` is hardcoded there).
 
 ## Architecture
@@ -94,5 +96,6 @@ Also update `src/lib/types.ts`, `normalizeUniversity()` in `api.ts` if the colum
 - All styling lives in one plain CSS file: `src/styles/app.css`. No CSS framework or CSS-in-JS.
 - Comments occasionally cite spec sections ("spec §4.3") from the original project spec; keep the style if editing near them.
 - Vercel SPA routing depends on the rewrite in `vercel.json` — don't remove it.
-- Keep the repo private: PRODUCTION.md's backup flow stores full-database artifacts in GitHub Actions.
+- Keep the repo private: `.github/workflows/backup-db.yml` stores full-database artifacts (incl. `auth.users`) in GitHub Actions for 90 days.
+- Backups: the Supabase project is on the free plan, which has **no** restorable platform backups. `backup-db.yml` (weekly, `supabase db dump` roles/schema/data) is the only database copy; each run restores into a throwaway local Supabase DB, re-applies `production_setup.sql` and compares row counts, so keep `production_setup.sql` re-runnable on a restored database. It and `purge-activity.yml` share the `SUPABASE_DB_URL` secret, which must be the **Session pooler** URI (the direct host is IPv6-only; GitHub runners are IPv4).
 - `PRODUCTION.md` is the go-live runbook. If you change setup steps, Edge Function behavior, or schema, check whether README.md and PRODUCTION.md need matching updates.

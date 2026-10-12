@@ -1,9 +1,14 @@
 name: Purge old activity data
 
 # Enforces the 30-day retention promised on the "Hoạt động nhân viên" screen.
-# Requires ONE GitHub secret:
-#   SUPABASE_DB_URL  — Supabase → Project Settings → Database → Connection
-#     string → URI (the postgresql://… value).
+# Requires ONE GitHub secret (shared with backup-db.yml):
+#   SUPABASE_DB_URL  — Supabase → Connect → **Session pooler** URI
+#     (postgresql://postgres.<ref>:<password>@aws-…pooler.supabase.com:5432/postgres).
+#     Not the "direct connection" string: that host is IPv6-only on the free
+#     plan and GitHub's runners are IPv4, so it cannot connect.
+#
+# Run "Weekly database backup" by hand before this succeeds for the first time:
+# its first run deletes everything older than 30 days in one go.
 #
 # Password sign-ins (login_logs.kind = 'login') are deliberately NOT purged:
 # that table is the security audit trail behind the "Bất thường" flagging.
@@ -22,9 +27,13 @@ jobs:
           DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           if [ -z "$DB_URL" ]; then
-            echo "::error::Missing secret SUPABASE_DB_URL. Add it in Settings → Secrets and variables → Actions."
+            echo "::error::Missing secret SUPABASE_DB_URL. Add the Session pooler URI in Settings → Secrets and variables → Actions."
             exit 1
           fi
+          case "$DB_URL" in
+            *@db.*.supabase.co*)
+              echo "::warning::SUPABASE_DB_URL looks like the direct connection string. GitHub runners are IPv4-only; use the Session pooler URI if this run cannot connect." ;;
+          esac
           psql "$DB_URL" -v ON_ERROR_STOP=1 \
             -c "delete from public.activity_events where occurred_at < now() - interval '30 days';" \
             -c "delete from public.login_logs where kind = 'resume' and login_at < now() - interval '30 days';"

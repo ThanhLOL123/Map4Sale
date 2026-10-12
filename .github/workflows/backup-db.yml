@@ -1,0 +1,170 @@
+name: Weekly database backup
+
+# Off-site copy of the whole Supabase database, kept 90 days as a workflow
+# artifact. The project is on the free plan, which has no Supabase backups at
+# all, so this is the only copy that exists. Uploaded images are NOT in here
+# (no database backup covers Storage) — see `npm run backup:images`.
+#
+# Requires ONE GitHub secret (shared with purge-activity.yml):
+#   SUPABASE_DB_URL — Supabase → Connect → **Session pooler** URI
+#     (postgresql://postgres.<ref>:<password>@aws-…pooler.supabase.com:5432/postgres).
+#     Not the "direct connection" string: that host is IPv6-only on the free
+#     plan and GitHub's runners are IPv4, so it cannot connect.
+#
+# Every run also proves the backup restores: the schema and the app's own data
+# are loaded into a throwaway local Supabase Postgres and the row counts are
+# compared with production. A backup that has never been restored is a hope,
+# not a backup — this turns a broken dump into a red run on the day it happens.
+#
+# Restoring for real: see "Restoring from a backup" in PRODUCTION.md.
+
+on:
+  workflow_dispatch: {} # run manually from the Actions tab
+  schedule:
+    - cron: '0 19 * * 0' # Sunday 19:00 UTC = 02:00 Monday giờ Việt Nam
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup-db
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      # Live row counts, taken before and after the dump so a staff member
+      # using the app during the backup cannot make the check fail: the
+      # restored count only has to land between the two.
+      COUNTS_SQL: >-
+        select 'public.universities', count(*) from public.universities
+        union all select 'public.profiles', count(*) from public.profiles
+        union all select 'public.login_logs', count(*) from public.login_logs
+        union all select 'public.activity_events', count(*) from public.activity_events
+        union all select 'auth.users', count(*) from auth.users
+        union all select 'storage.objects', count(*) from storage.objects
+    steps:
+      # Only for the restore test, which re-applies supabase/production_setup.sql.
+      - uses: actions/checkout@v4
+
+      - name: Check the secret
+        run: |
+          if [ -z "$DB_URL" ]; then
+            echo "::error::Missing secret SUPABASE_DB_URL. Add the Session pooler URI in Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          case "$DB_URL" in
+            *@db.*.supabase.co*)
+              echo "::warning::SUPABASE_DB_URL looks like the direct connection string. GitHub runners are IPv4-only; use the Session pooler URI if this run cannot connect." ;;
+          esac
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Count rows (before)
+        run: |
+          mkdir -p backup
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -At -F ' ' -c "$COUNTS_SQL" > backup/counts-before.txt
+          cat backup/counts-before.txt
+
+      # The three-file method from Supabase's "Backup and Restore using the CLI"
+      # guide. Not raw pg_dump: that drags in platform internals that fail on
+      # restore. data.sql includes auth.users, so accounts survive a restore.
+      - name: Dump roles, schema and data
+        run: |
+          supabase db dump --db-url "$DB_URL" -f backup/roles.sql --role-only
+          supabase db dump --db-url "$DB_URL" -f backup/schema.sql
+          supabase db dump --db-url "$DB_URL" -f backup/data.sql --use-copy --data-only \
+            -x storage.buckets_vectors -x storage.vector_indexes
+          # Only for the restore test below; not part of the backup itself.
+          mkdir -p check
+          supabase db dump --db-url "$DB_URL" -f check/public-data.sql --use-copy --data-only --schema public
+
+      - name: Count rows (after)
+        run: psql "$DB_URL" -v ON_ERROR_STOP=1 -At -F ' ' -c "$COUNTS_SQL" > backup/counts-after.txt
+
+      - name: Name the artifact
+        id: meta
+        run: echo "name=db-backup-$(date -u +%F)-run${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
+      # Uploaded before the restore test on purpose: if the test is what
+      # breaks, the copy should still exist. The run is still marked failed.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.name }}
+          path: backup/
+          retention-days: 90
+          if-no-files-found: error
+
+      # Restores into a local Supabase Postgres, not a bare one: schema.sql
+      # refers to auth.users, auth.uid() and the anon/authenticated roles,
+      # which only a Supabase database has. Auth and Storage are left running
+      # because their startup migrations are what create those schemas.
+      - name: Start a throwaway Supabase database
+        run: |
+          mkdir -p sandbox && cd sandbox
+          # No terminal in CI: an empty stdin makes any prompt take its default.
+          supabase init --force < /dev/null
+          sed -i 's/^major_version = .*/major_version = 17/' supabase/config.toml
+          supabase start -x studio,imgproxy,edge-runtime,logflare,vector
+
+      # Only our own data is restored here (public schema). auth.* and
+      # storage.* rows belong to tables whose columns follow the Supabase
+      # service versions, which differ between this local CLI and production;
+      # loading them here would fail on version drift, not on a bad backup.
+      # Their completeness is checked by counting rows in data.sql instead.
+      - name: Restore schema and app data
+        run: |
+          LOCAL_URL=$(cd sandbox && supabase status -o env | sed -n 's/^DB_URL="\{0,1\}\([^"]*\)"\{0,1\}$/\1/p')
+          LOCAL_URL=${LOCAL_URL:-postgresql://postgres:postgres@127.0.0.1:54322/postgres}
+          echo "LOCAL_URL=$LOCAL_URL" >> "$GITHUB_ENV"
+          # Supabase's guide: the CLI login role cannot be re-granted elsewhere.
+          # Edited on a copy, so the uploaded backup stays exactly as dumped.
+          sed '/cli_login_postgres/ s/^/-- /' backup/roles.sql > check/roles.sql
+          psql "$LOCAL_URL" --single-transaction -v ON_ERROR_STOP=1 -q \
+            -f check/roles.sql \
+            -f backup/schema.sql \
+            -c 'SET session_replication_role = replica' \
+            -f check/public-data.sql
+
+      # The dump leaves out what lives in Supabase's own schemas: the trigger on
+      # auth.users that creates profiles, the Storage bucket and its policies.
+      # PRODUCTION.md's restore runbook re-applies them with the re-runnable
+      # setup script, so run that exact step here too — it proves the runbook,
+      # and catches the setup script drifting from the live schema.
+      - name: Re-apply production_setup.sql, as the runbook does
+        run: psql "$LOCAL_URL" -v ON_ERROR_STOP=1 -q -f supabase/production_setup.sql
+
+      - name: Compare restored rows with production
+        run: |
+          # Rows in one table's COPY block of a dump (quotes ignored, so both
+          # COPY auth.users and COPY "auth"."users" match).
+          copy_rows() {
+            awk -v t="$1" '
+              { line = $0; gsub(/"/, "", line) }
+              index(line, "COPY " t " ") == 1 { on = 1; next }
+              on && $0 == "\\." { on = 0; next }
+              on { n++ }
+              END { print n + 0 }' "$2"
+          }
+          fail=0
+          while read -r table before; do
+            after=$(awk -v t="$table" '$1 == t { print $2 }' backup/counts-after.txt)
+            lo=$(( before < after ? before : after ))
+            hi=$(( before > after ? before : after ))
+            case "$table" in
+              public.*) got=$(psql "$LOCAL_URL" -At -c "select count(*) from $table") ; how=restored ;;
+              *)        got=$(copy_rows "$table" backup/data.sql)                    ; how="in data.sql" ;;
+            esac
+            if [ "$got" -ge "$lo" ] && [ "$got" -le "$hi" ]; then
+              echo "OK    $table: $got $how (production $lo..$hi)"
+            else
+              echo "::error::$table: $got $how, but production had $lo..$hi"
+              fail=1
+            fi
+          done < backup/counts-before.txt
+          exit $fail
